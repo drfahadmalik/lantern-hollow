@@ -1,0 +1,48 @@
+LANTERN HOLLOW - ANDROID APK
+============================
+
+This folder is a ready Android project. The game itself is www/index.html
+(it is also already copied into android/app/src/main/assets/public/).
+It works fully offline, in landscape, full screen, with the on-screen touch buttons.
+
+------------------------------------------------------------
+OPTION A - Android Studio (on your computer)
+------------------------------------------------------------
+1. Install Android Studio (free): https://developer.android.com/studio
+2. Unzip "LanternHollow-AndroidStudio.zip".
+3. Android Studio > Open > choose the "android" folder inside it.
+4. Wait for "Gradle sync" to finish (first time it downloads a lot - needs internet).
+5. Menu: Build > Build App Bundle(s) / APK(s) > Build APK(s)
+6. When it finishes click "locate". The file is:
+   android/app/build/outputs/apk/debug/app-debug.apk
+7. Copy app-debug.apk to your phone and open it
+   (allow "Install unknown apps" when the phone asks).
+
+------------------------------------------------------------
+OPTION B - No software: GitHub builds it for you
+------------------------------------------------------------
+1. Make a free account on github.com and create a New repository
+   (name: lantern-hollow, Public or Private).
+2. On the new repo page click "uploading an existing file".
+3. Unzip "LanternHollow-GitHub.zip" and drag ALL its contents
+   (including the hidden ".github" folder) into the page, then "Commit changes".
+   Tip: on Windows turn on View > Hidden items so you can see ".github".
+4. Open the "Actions" tab. "Build Lantern Hollow APK" starts by itself
+   (or press "Run workflow"). It takes about 5-8 minutes.
+5. Open the finished run > at the bottom under "Artifacts" download "LanternHollow-apk".
+   Unzip it - inside is app-debug.apk. Copy it to your phone and install.
+
+------------------------------------------------------------
+Updating the game later
+------------------------------------------------------------
+Replace www/index.html with the new game file, then build again
+(Option B: upload the new www/index.html to the repo - it rebuilds automatically).
+
+------------------------------------------------------------
+Google Play Store
+------------------------------------------------------------
+The APK above is a "debug" build: perfect for your own phone and for sharing.
+For the Play Store you need a signed release "AAB":
+Android Studio > Build > Generate Signed App Bundle / APK > Android App Bundle,
+create a keystore (keep it safe forever), choose "release".
+App id: com.lanternhollow.game
