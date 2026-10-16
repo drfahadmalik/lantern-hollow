@@ -156,6 +156,9 @@ h1 span { color: var(--ember); }
 #lvIntro.show { opacity: 1; }
 #lvIntro .lv-name { font-family: var(--font-display); font-size: clamp(2rem, 6vw, 3.4rem); color: var(--mist); line-height: 1; margin-top: 0.4rem; }
 
+/* no on-screen buttons: the whole screen is the controller */
+#pads, #ropePads { display: none !important; }
+.ver { opacity: 0.55; letter-spacing: 0.08em; }
 /* short landscape phones: keep the whole menu on screen */
 @media (max-height: 560px) {
   .card { bottom: max(12px, env(safe-area-inset-bottom, 0px)); gap: 0.55rem; max-height: calc(100% - 24px); overflow-y: auto; }
@@ -190,7 +193,7 @@ h1 span { color: var(--ember); }
   </div>
 
   <section class="card" id="menuCard" aria-hidden="false">
-    <div class="eyebrow">A story in the dark</div>
+    <div class="eyebrow">A story in the dark <span class="ver">· v1.3</span></div>
     <h1>Lantern <span>Hollow</span></h1>
     <p>A small traveller, a lantern, and someone to find.</p>
     <div class="row">
@@ -2228,7 +2231,7 @@ h1 span { color: var(--ember); }
     const stepIdx = Math.floor(RIG.uTot * 2);
     if (stepIdx !== RIG.lastStep) {
       RIG.lastStep = stepIdx;
-      if (P.onGround && w > 0.5) { puff(P.x + P.facing * 0.1, P.y, rn > 0.5 ? 4 : 2, 0.08 + 0.1 * rn, { spread: 0.15 }); sfx.step(0.35 + 0.65 * rn); }
+      if (P.onGround && w > 0.5) { puff(P.x + P.facing * 0.1, P.y, rn > 0.5 ? 4 : 2, 0.08 + 0.1 * rn, { spread: 0.15 }); }   // footsteps are silent: only the wind
     }
 
     // idle: now and then look around
