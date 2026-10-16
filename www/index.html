@@ -193,7 +193,7 @@ h1 span { color: var(--ember); }
   </div>
 
   <section class="card" id="menuCard" aria-hidden="false">
-    <div class="eyebrow">A story in the dark <span class="ver">· v1.3</span></div>
+    <div class="eyebrow">A story in the dark <span class="ver">· v1.4</span></div>
     <h1>Lantern <span>Hollow</span></h1>
     <p>A small traveller, a lantern, and someone to find.</p>
     <div class="row">
@@ -1008,7 +1008,7 @@ h1 span { color: var(--ember); }
     lever: () => { noiseHit({ freq: 420, q: 4, gain: 0.12, decay: 0.25, rate: 0.6 }); setTimeout(() => { noiseHit({ freq: 700, q: 2, gain: 0.16, decay: 0.07 }); tone(120, 0.08, 0.18); }, 160); },
     leverBack: () => { noiseHit({ freq: 650, q: 2, gain: 0.14, decay: 0.07 }); tone(100, 0.07, 0.15); },
     rumble: k => { noiseHit({ freq: 90 + Math.random() * 40, q: 0.8, gain: 0.16 * k, decay: 0.35, rate: 0.5 }); tone(42, 0.12 * k, 0.3); },
-    crash: () => { noiseHit({ freq: 160, q: 0.6, gain: 0.5, decay: 0.9, rate: 0.6 }); tone(38, 0.45, 1.2, "sine", 24); noiseHit({ freq: 1200, q: 0.8, gain: 0.15, decay: 0.3 }); },
+    crash: (k = 1) => { if (k <= 0.02) return; noiseHit({ freq: 160, q: 0.6, gain: 0.5 * k, decay: 0.9, rate: 0.6 }); tone(38, 0.45 * k, 1.2, "sine", 24); noiseHit({ freq: 1200, q: 0.8, gain: 0.15 * k, decay: 0.3 }); },
     splash: () => { noiseHit({ freq: 900, q: 0.4, gain: 0.3, decay: 0.6, type: "lowpass" }); tone(110, 0.1, 0.4, "sine", 55); },
   };
   let rumbleT = 0, crashShake = 0;
@@ -1045,7 +1045,7 @@ h1 span { color: var(--ember); }
       const under = r => r.l < g.r && r.r > g.l && r.t > nb && r.b < nb;
       if (under(pRect()) || BOXES.some(b => under(bRect(b)))) nOpen = g.open;
     }
-    if (Math.abs(nOpen - g.open) > 1e-4) { g.sndT -= dt; if (g.sndT <= 0) { sfx.gate(); g.sndT = 0.45; } }
+    if (Math.abs(nOpen - g.open) > 1e-4) { g.sndT -= dt; if (g.sndT <= 0) { if (Math.abs(P.x - g.x) < 12) sfx.gate(); g.sndT = 0.45; } }
     else g.sndT = 0;
     g.open = nOpen; g.b = g.base + g.open * g.lift; g.t = g.b + g.h;
   }
@@ -1253,7 +1253,7 @@ h1 span { color: var(--ember); }
         const ot = m.t; m.t = p.base + s * p.off; m.b = m.t - 0.28;
         if (P.groundRef === m) P.y += m.t - ot;
       }
-      if (Math.abs(p.off - o) > 1e-4) { p.sndT -= dt; if (p.sndT <= 0) { sfx.creak(); p.sndT = 0.6; } } else p.sndT = 0;
+      if (Math.abs(p.off - o) > 1e-4) { p.sndT -= dt; if (p.sndT <= 0) { if (Math.abs(P.x - p.A.cx) < 12) sfx.creak(); p.sndT = 0.6; } } else p.sndT = 0;
     }
     for (const c of CRUSHERS) {
       const held = c.plateRef && c.plateRef.pressed;
@@ -1267,7 +1267,7 @@ h1 span { color: var(--ember); }
         if (c.state === "up" && c.t > c.wait) { c.state = "fall"; c.v = 0; }
         if (c.state === "fall") {
           c.v = Math.min(14, c.v + 40 * dt); c.y -= c.v * dt;
-          if (c.y <= stopAt) { c.y = stopAt; c.state = "down"; c.t = 0; mechSfx.crash(); crashShake = Math.max(crashShake, clamp(1 - Math.abs(P.x - c.x) / 10, 0, 0.6)); puff(c.x, low, 10, 0.4, { vx: 3, vy: 1.2, spread: c.half * 2 }); }
+          if (c.y <= stopAt) { c.y = stopAt; c.state = "down"; c.t = 0; mechSfx.crash(clamp(1 - Math.abs(P.x - c.x) / 11, 0, 1) * 0.7); crashShake = Math.max(crashShake, clamp(1 - Math.abs(P.x - c.x) / 10, 0, 0.6)); puff(c.x, low, 10, 0.4, { vx: 3, vy: 1.2, spread: c.half * 2 }); }
         } else if (c.state === "down" && c.t > (c.down || 0.5)) { c.state = "rise"; }
         else if (c.state === "rise") { c.y = Math.min(high, c.y + (c.riseV || 1.3) * dt); if (c.y >= high) { c.state = "up"; c.t = 0; } }
       }
@@ -1276,7 +1276,7 @@ h1 span { color: var(--ember); }
     }
     for (const w of WATERS) if (w.y0 != null) {
       const ow = w.y; w.y = moveTowards(w.y, w.up ? w.y1 : w.y0, (w.up ? w.rise : w.fall) * dt);
-      if (Math.abs(w.y - ow) > 1e-5) { w.sndT = (w.sndT || 0) - dt; if (w.sndT <= 0) { noiseHit({ freq: 400, q: 0.5, gain: 0.08, decay: 0.8, type: "lowpass" }); w.sndT = 0.7; } }
+      if (Math.abs(w.y - ow) > 1e-5 && Math.abs(P.x - (w.l + w.r) / 2) < 14) { w.sndT = (w.sndT || 0) - dt; if (w.sndT <= 0) { noiseHit({ freq: 400, q: 0.5, gain: 0.08, decay: 0.8, type: "lowpass" }); w.sndT = 0.7; } }
     }
   }
   const crusherRects = () => CRUSHERS.map(c => ({ l: c.l, r: c.r, b: c.y, t: c.y + 1.4 }));
@@ -1422,7 +1422,7 @@ h1 span { color: var(--ember); }
     for (const k of ["left", "right", "up", "down", "grab"]) pads[k] = false;
     if (state !== "play" || TOUCH.size === 0) return;
     const list = [...TOUCH.values()].sort((a, b) => a.t0 - b.t0), p = list[0];
-    const dx = p.x - p.x0, dy = p.y - p.y0, dead = 16;
+    const dx = p.x - p.x0, dy = p.y - p.y0, dead = (p.hold || list.length > 1) ? 9 : 16;
     if (dx > dead) pads.right = true; else if (dx < -dead) pads.left = true;
     if (dy > 34) pads.down = true;
     if (P.rope && dy < -34) pads.up = true;
@@ -1431,11 +1431,11 @@ h1 span { color: var(--ember); }
   function touchStart(e) {
     if (e.pointerType === "mouse") return;
     e.preventDefault();
-    try { gameCanvas.setPointerCapture(e.pointerId); } catch (_) {}
+    if (typeof e.pointerId === "number") { try { gameCanvas.setPointerCapture(e.pointerId); } catch (_) {} }
     const now = performance.now();
     TOUCH.set(e.pointerId, { x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, t0: now, fy: e.clientY, ft: now, moved: 0, hold: false, flicked: false });
     clearTimeout(touchStart.t);
-    touchStart.t = setTimeout(() => { const q = TOUCH.get(e.pointerId); if (q && q.moved < 14 && !q.flicked) { q.hold = true; touchUpdate(); } }, 330);
+    touchStart.t = setTimeout(() => { const q = TOUCH.get(e.pointerId); if (q && q.moved < 26 && !q.flicked) { q.hold = true; q.x0 = q.x; q.y0 = q.y; touchUpdate(); } }, 300);
     touchUpdate();
   }
   function touchMove(e) {
@@ -1449,19 +1449,28 @@ h1 span { color: var(--ember); }
     // a quick upward flick jumps (on a rope, upward drags climb instead)
     const now = performance.now();
     if (now - q.ft > 160) { q.fy = q.y; q.ft = now; }
-    if (!P.rope && !q.flicked && q.fy - q.y > 38) { q.flicked = true; touchJump(); q.y0 = q.y; }
+    if (!P.rope && !q.hold && !q.flicked && q.fy - q.y > 38) { q.flicked = true; touchJump(); q.y0 = q.y; }
     if (q.flicked && q.y - q.fy > 10) q.flicked = false;
     touchUpdate();
   }
   function touchEnd(e) {
     const q = TOUCH.get(e.pointerId); if (!q) return;
     TOUCH.delete(e.pointerId);
-    if (performance.now() - q.t0 < 230 && q.moved < 14 && !q.hold) touchJump();
+    if (performance.now() - q.t0 < 280 && q.moved < 16 && !q.hold) touchJump();
     touchUpdate();
   }
-  gameCanvas.addEventListener("pointerdown", touchStart, { passive: false });
-  gameCanvas.addEventListener("pointermove", touchMove, { passive: false });
-  gameCanvas.addEventListener("pointerup", touchEnd); gameCanvas.addEventListener("pointercancel", touchEnd);
+  // real touch events on phones (an Android long-press can cancel pointer events and drop the grab)
+  const asP = t => ({ pointerId: "t" + t.identifier, pointerType: "touch", clientX: t.clientX, clientY: t.clientY, preventDefault() {} });
+  if ("ontouchstart" in window) {
+    gameCanvas.addEventListener("touchstart", e => { e.preventDefault(); for (const t of e.changedTouches) touchStart(asP(t)); }, { passive: false });
+    gameCanvas.addEventListener("touchmove", e => { e.preventDefault(); for (const t of e.changedTouches) touchMove(asP(t)); }, { passive: false });
+    const endT = e => { e.preventDefault(); for (const t of e.changedTouches) touchEnd(asP(t)); };
+    gameCanvas.addEventListener("touchend", endT, { passive: false }); gameCanvas.addEventListener("touchcancel", endT, { passive: false });
+  } else {
+    gameCanvas.addEventListener("pointerdown", touchStart, { passive: false });
+    gameCanvas.addEventListener("pointermove", touchMove, { passive: false });
+    gameCanvas.addEventListener("pointerup", touchEnd); gameCanvas.addEventListener("pointercancel", touchEnd);
+  }
   gameCanvas.addEventListener("contextmenu", e => e.preventDefault());
   gameCanvas.style.touchAction = "none";
 
@@ -2231,7 +2240,7 @@ h1 span { color: var(--ember); }
     const stepIdx = Math.floor(RIG.uTot * 2);
     if (stepIdx !== RIG.lastStep) {
       RIG.lastStep = stepIdx;
-      if (P.onGround && w > 0.5) { puff(P.x + P.facing * 0.1, P.y, rn > 0.5 ? 4 : 2, 0.08 + 0.1 * rn, { spread: 0.15 }); }   // footsteps are silent: only the wind
+      if (P.onGround && w > 0.5) { puff(P.x + P.facing * 0.1, P.y, rn > 0.5 ? 4 : 2, 0.08 + 0.1 * rn, { spread: 0.15 }); sfx.step(0.35 + 0.65 * rn); }
     }
 
     // idle: now and then look around
@@ -3534,7 +3543,7 @@ h1 span { color: var(--ember); }
     $("muteBtn").setAttribute("aria-label", AUD.muted ? "Turn sound on" : "Turn sound off");
     $("muteBtn").blur();
   });
-  if (isTouch) $("keyHelp").textContent = "Drag to move · flick up or tap to jump · hold your finger still to grab · v1.3";
+  if (isTouch) $("keyHelp").textContent = "Drag to move · flick up or tap to jump · hold your finger still to grab · v1.4";
 
   function buildLevelList() {
     const list = $("levelList");
