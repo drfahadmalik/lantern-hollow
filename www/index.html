@@ -312,15 +312,6 @@ h1 span { color: var(--ember); }
       conv.connect(wet); wet.connect(AUD.master);
       AUD.reverb = conv;
 
-      // low, uneasy drone under everything
-      const dg = a.createGain(); dg.gain.value = 0.022;
-      const dl = a.createBiquadFilter(); dl.type = "lowpass"; dl.frequency.value = 260;
-      dl.connect(dg); dg.connect(AUD.master);
-      for (const [f, ty] of [[55, "sine"], [57.6, "sine"], [82.4, "triangle"]]) {
-        const o = a.createOscillator(); o.type = ty; o.frequency.value = f; o.connect(dl); o.start();
-      }
-      const lfo = a.createOscillator(), lg = a.createGain(); lfo.frequency.value = 0.07; lg.gain.value = 0.012;
-      lfo.connect(lg); lg.connect(dg.gain); lfo.start();
     } catch (_) { AUD.ctx = null; }
   }
 
@@ -649,9 +640,9 @@ h1 span { color: var(--ember); }
       clues: [{ type: "ribbon", x: 16.2, y: 0, text: "Her ribbon… she came this way." }],
       ghosts: [{ trig: 24.5, x: 31.8 }],
       hints: [
-        { x: -3, t: "A / D to move · Space to jump", tt: "Left buttons to move · ^ to jump", ms: 4500 },
-        { x: 29, t: "Walk into a crate to push it · hold E to grab and pull", tt: "Walk into a crate to push it · hold Grab to pull", ms: 4500 },
-        { x: 50, t: "On a rope: W / ↑ climbs up, S / ↓ climbs down", tt: "On a rope: ▲ climbs up, ▼ climbs down", ms: 4500 },
+        { x: -3, t: "A / D to move · Space to jump", tt: "Drag left or right to move · flick up or tap to jump", ms: 4500 },
+        { x: 29, t: "Walk into a crate to push it · hold E to grab and pull", tt: "Walk into a crate to push it · hold your finger still to grab, then drag to pull", ms: 4500 },
+        { x: 50, t: "On a rope: W / ↑ climbs up, S / ↓ climbs down", tt: "On a rope: drag up or down to climb · tap to let go", ms: 4500 },
       ],
       howl: [16, 26],
     },
@@ -719,7 +710,7 @@ h1 span { color: var(--ember); }
       clues: [],
       ghosts: [{ trig: 96.5, x: 103.4 }],
       hints: [
-        { x: 36, t: "Hold E next to a lever to pull it", tt: "Hold Grab next to a lever to pull it", ms: 4000 },
+        { x: 36, t: "Hold E next to a lever to pull it", tt: "Hold your finger still next to a lever to pull it", ms: 4000 },
       ],
       howl: [12, 22],
     },
@@ -1414,6 +1405,63 @@ h1 span { color: var(--ember); }
   bindPad("padL", "left"); bindPad("padR", "right"); bindPad("padJ", "jump");
   bindPad("padGrab", "grab"); bindPad("padUp", "up"); bindPad("padDown", "down");
 
+  // Invisible touch controls, LIMBO-style:
+  //   drag left / right anywhere ........ walk
+  //   flick up, or a quick tap .......... jump (a tap lets go of a rope)
+  //   drag down ......................... crouch / climb down a rope
+  //   drag up while on a rope ........... climb up
+  //   hold a finger still, or put a second finger down ... grab (crates, levers); keep holding and drag to pull
+  const TOUCH = new Map();
+  // a touch jump is a full jump: hold the jump for its whole rise
+  const touchJump = () => { if (state !== "play") return; jumpQueued = true; pads.jump = true; clearTimeout(touchJump.t); touchJump.t = setTimeout(() => { pads.jump = false; }, 380); };
+  const gameCanvas = document.getElementById("game");
+  function touchUpdate() {
+    for (const k of ["left", "right", "up", "down", "grab"]) pads[k] = false;
+    if (state !== "play" || TOUCH.size === 0) return;
+    const list = [...TOUCH.values()].sort((a, b) => a.t0 - b.t0), p = list[0];
+    const dx = p.x - p.x0, dy = p.y - p.y0, dead = 16;
+    if (dx > dead) pads.right = true; else if (dx < -dead) pads.left = true;
+    if (dy > 34) pads.down = true;
+    if (P.rope && dy < -34) pads.up = true;
+    pads.grab = list.length > 1 || list.some(q => q.hold);
+  }
+  function touchStart(e) {
+    if (e.pointerType === "mouse") return;
+    e.preventDefault();
+    try { gameCanvas.setPointerCapture(e.pointerId); } catch (_) {}
+    const now = performance.now();
+    TOUCH.set(e.pointerId, { x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, t0: now, fy: e.clientY, ft: now, moved: 0, hold: false, flicked: false });
+    clearTimeout(touchStart.t);
+    touchStart.t = setTimeout(() => { const q = TOUCH.get(e.pointerId); if (q && q.moved < 14 && !q.flicked) { q.hold = true; touchUpdate(); } }, 330);
+    touchUpdate();
+  }
+  function touchMove(e) {
+    const q = TOUCH.get(e.pointerId); if (!q) return;
+    e.preventDefault();
+    q.x = e.clientX; q.y = e.clientY;
+    q.moved = Math.max(q.moved, Math.hypot(q.x - q.x0, q.y - q.y0));
+    // keep the drag origin within reach so turning around is quick
+    const lim = 70;
+    if (q.x - q.x0 > lim) q.x0 = q.x - lim; else if (q.x0 - q.x > lim) q.x0 = q.x + lim;
+    // a quick upward flick jumps (on a rope, upward drags climb instead)
+    const now = performance.now();
+    if (now - q.ft > 160) { q.fy = q.y; q.ft = now; }
+    if (!P.rope && !q.flicked && q.fy - q.y > 38) { q.flicked = true; touchJump(); q.y0 = q.y; }
+    if (q.flicked && q.y - q.fy > 10) q.flicked = false;
+    touchUpdate();
+  }
+  function touchEnd(e) {
+    const q = TOUCH.get(e.pointerId); if (!q) return;
+    TOUCH.delete(e.pointerId);
+    if (performance.now() - q.t0 < 230 && q.moved < 14 && !q.hold) touchJump();
+    touchUpdate();
+  }
+  gameCanvas.addEventListener("pointerdown", touchStart, { passive: false });
+  gameCanvas.addEventListener("pointermove", touchMove, { passive: false });
+  gameCanvas.addEventListener("pointerup", touchEnd); gameCanvas.addEventListener("pointercancel", touchEnd);
+  gameCanvas.addEventListener("contextmenu", e => e.preventDefault());
+  gameCanvas.style.touchAction = "none";
+
   function step(dt) {
     if (state === "paused") return;
     simT += dt;
@@ -1742,7 +1790,6 @@ h1 span { color: var(--ember); }
     WIFE.scared += ((t > 15.4 ? 1 : 0) - WIFE.scared) * Math.min(1, dt * 4);
     if (!I.howled && t >= 15.2) {
       I.howled = true; I.shake = 1;
-      try { howl(0, 330, 0.17, 0.85, false, true); setTimeout(() => howl(0, 372, 0.12, 0.95, false, true), 1150); } catch (_) {}
       for (let i = 0; i < 7; i++) BIRDS.push({ x: 0.72 + Math.random() * 0.2, y: 0.32 + Math.random() * 0.1, dir: -1, sp: 0.09 + Math.random() * 0.04, ph: Math.random() * TAU, size: 0.1 + Math.random() * 0.05 });
     }
     I.shake = Math.max(0, I.shake - dt * 0.6);
@@ -3467,7 +3514,7 @@ h1 span { color: var(--ember); }
     if (id) $("lvIntro").classList.remove("show");
     $("stage").classList.toggle("dim", !!id); $("stage").classList.toggle("center", id === "storyCard");
   }
-  function showPads(on) { $("pads").hidden = !(on && isTouch); }
+  function showPads(on) { $("pads").hidden = true; if (!on) { TOUCH.clear(); for (const k in pads) pads[k] = false; } }
   function showHud(on) { $("hud").hidden = !on; }
   function flashHint(text, ms) {
     hint.textContent = text; hint.classList.add("show");
@@ -3484,7 +3531,7 @@ h1 span { color: var(--ember); }
     $("muteBtn").setAttribute("aria-label", AUD.muted ? "Turn sound on" : "Turn sound off");
     $("muteBtn").blur();
   });
-  if (isTouch) $("keyHelp").textContent = "Use the buttons below to move, grab and jump";
+  if (isTouch) $("keyHelp").textContent = "Drag to move · flick up or tap to jump · hold your finger still to grab";
 
   function buildLevelList() {
     const list = $("levelList");
@@ -3598,7 +3645,6 @@ h1 span { color: var(--ember); }
       if (h.gate != null && GATES[h.gate] && GATES[h.gate].open > 0.5) return;
       hinted[i] = true;
       if (h.ev === "howl") {
-        if (AUD.ctx && AUD.reverb && !AUD.muted) { try { howl(0, 320, 0.13, 0.5, true); } catch (_) {} }
         EYES.spawn(); EYES.spawn();
         return;
       }
@@ -3632,7 +3678,7 @@ h1 span { color: var(--ember); }
       render(now / 1000, dt);
       updateSay();
       const rp = !!(P.rope && isTouch && state === "play");
-      if (rp !== ropePadsOn) { ropePadsOn = rp; $("ropePads").hidden = !rp; }
+      if (rp !== ropePadsOn) { ropePadsOn = rp; $("ropePads").hidden = true; }
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
