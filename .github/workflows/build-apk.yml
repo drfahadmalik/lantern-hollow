@@ -4,6 +4,9 @@ on:
   push:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-24.04
@@ -37,3 +40,11 @@ jobs:
         with:
           name: LanternHollow-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Publish the APK to the download page
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk LanternHollow.apk
+          gh release delete latest --yes --cleanup-tag || true
+          gh release create latest LanternHollow.apk --title "Lantern Hollow (latest)" --notes "Download LanternHollow.apk below and install it on your phone."
+        env:
+          GH_TOKEN: ${{ github.token }}
