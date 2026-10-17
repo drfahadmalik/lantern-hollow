@@ -193,7 +193,7 @@ h1 span { color: var(--ember); }
   </div>
 
   <section class="card" id="menuCard" aria-hidden="false">
-    <div class="eyebrow">A story in the dark <span class="ver">· v1.4</span></div>
+    <div class="eyebrow">A story in the dark <span class="ver">· v1.5</span></div>
     <h1>Lantern <span>Hollow</span></h1>
     <p>A small traveller, a lantern, and someone to find.</p>
     <div class="row">
@@ -1422,18 +1422,22 @@ h1 span { color: var(--ember); }
     for (const k of ["left", "right", "up", "down", "grab"]) pads[k] = false;
     if (state !== "play" || TOUCH.size === 0) return;
     const list = [...TOUCH.values()].sort((a, b) => a.t0 - b.t0), p = list[0];
-    const dx = p.x - p.x0, dy = p.y - p.y0, dead = (p.hold || list.length > 1) ? 9 : 16;
+    // the finger that has dragged furthest steers, so "hold with one finger, drag with another" works too
+    const grabbing = list.some(q => q.hold) || list.length > 1;
+    let mv = p; for (const q of list) if (Math.abs(q.x - q.x0) > Math.abs(mv.x - mv.x0)) mv = q;
+    const dx = mv.x - mv.x0, dy = p.y - p.y0, dead = grabbing ? 9 : 16;
     if (dx > dead) pads.right = true; else if (dx < -dead) pads.left = true;
     if (dy > 34) pads.down = true;
     if (P.rope && dy < -34) pads.up = true;
-    pads.grab = list.length > 1 || list.some(q => q.hold);
+    pads.grab = grabbing;
   }
   function touchStart(e) {
     if (e.pointerType === "mouse") return;
     e.preventDefault();
     if (typeof e.pointerId === "number") { try { gameCanvas.setPointerCapture(e.pointerId); } catch (_) {} }
     const now = performance.now();
-    TOUCH.set(e.pointerId, { x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, t0: now, fy: e.clientY, ft: now, moved: 0, hold: false, flicked: false });
+    const regrab = !!P.held || now - (touchEnd.heldAt || -1e9) < 700;
+    TOUCH.set(e.pointerId, { x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, t0: now, fy: e.clientY, ft: now, moved: 0, hold: regrab, flicked: false });
     clearTimeout(touchStart.t);
     touchStart.t = setTimeout(() => { const q = TOUCH.get(e.pointerId); if (q && q.moved < 26 && !q.flicked) { q.hold = true; q.x0 = q.x; q.y0 = q.y; touchUpdate(); } }, 300);
     touchUpdate();
@@ -1456,6 +1460,7 @@ h1 span { color: var(--ember); }
   function touchEnd(e) {
     const q = TOUCH.get(e.pointerId); if (!q) return;
     TOUCH.delete(e.pointerId);
+    if (P.held && TOUCH.size === 0) touchEnd.heldAt = performance.now();
     if (performance.now() - q.t0 < 280 && q.moved < 16 && !q.hold) touchJump();
     touchUpdate();
   }
@@ -3543,7 +3548,7 @@ h1 span { color: var(--ember); }
     $("muteBtn").setAttribute("aria-label", AUD.muted ? "Turn sound on" : "Turn sound off");
     $("muteBtn").blur();
   });
-  if (isTouch) $("keyHelp").textContent = "Drag to move · flick up or tap to jump · hold your finger still to grab · v1.4";
+  if (isTouch) $("keyHelp").textContent = "Drag to move · flick up or tap to jump · hold your finger still to grab · v1.5";
 
   function buildLevelList() {
     const list = $("levelList");
