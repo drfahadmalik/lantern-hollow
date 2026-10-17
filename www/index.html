@@ -193,7 +193,7 @@ h1 span { color: var(--ember); }
   </div>
 
   <section class="card" id="menuCard" aria-hidden="false">
-    <div class="eyebrow">A story in the dark <span class="ver">· v1.7</span></div>
+    <div class="eyebrow">A story in the dark <span class="ver">· v1.8</span></div>
     <h1>Lantern <span>Hollow</span></h1>
     <p>A small traveller, a lantern, and someone to find.</p>
     <div class="row">
@@ -1095,8 +1095,12 @@ h1 span { color: var(--ember); }
         while (wolfGround(l) < b.gy - 1.0 && l > b.x - 4) l -= 0.05;
         while (wolfGround(r) < b.gy - 1.0 && r < b.x + 4) r += 0.05;
         if (r - l < 2 * b.r) {
-          b.state = 2; b.x = (l + r) / 2; b.y = b.gy + b.r * 0.15; b.v = 0;
+          // it settles deep in the pit, its rounded back standing proud of the ground: a hump to climb over
+          b.state = 2; b.x = (l + r) / 2; b.y = b.gy - b.r * 0.32; b.v = 0;
+          const top = b.y + b.r, cx = b.x;
           PLUGS.push({ l, r, b: -30, t: b.gy - 0.02 });
+          PLUGS.push({ l: cx - b.r * 0.92, r: cx + b.r * 0.92, b: b.gy - 0.05, t: top - 0.62 });
+          PLUGS.push({ l: cx - b.r * 0.62, r: cx + b.r * 0.62, b: b.gy - 0.05, t: top - 0.2 });
           mechSfx.crash(); crashShake = 1;
           puff(b.x, b.gy, 26, 0.5, { vx: 4, vy: 3, vy0: 1, life: 0.9, r: 0.06, grow: 0.3, spread: 1.6 });
           continue;
@@ -3564,7 +3568,7 @@ h1 span { color: var(--ember); }
     $("muteBtn").setAttribute("aria-label", AUD.muted ? "Turn sound on" : "Turn sound off");
     $("muteBtn").blur();
   });
-  if (isTouch) $("keyHelp").textContent = "Drag to move · flick up or tap to jump · hold your finger still to grab · v1.7";
+  if (isTouch) $("keyHelp").textContent = "Drag to move · flick up or tap to jump · hold your finger still to grab · v1.8";
 
   function buildLevelList() {
     const list = $("levelList");
