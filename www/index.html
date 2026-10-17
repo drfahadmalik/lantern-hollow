@@ -193,7 +193,7 @@ h1 span { color: var(--ember); }
   </div>
 
   <section class="card" id="menuCard" aria-hidden="false">
-    <div class="eyebrow">A story in the dark <span class="ver">· v1.6</span></div>
+    <div class="eyebrow">A story in the dark <span class="ver">· v1.7</span></div>
     <h1>Lantern <span>Hollow</span></h1>
     <p>A small traveller, a lantern, and someone to find.</p>
     <div class="row">
@@ -1416,7 +1416,7 @@ h1 span { color: var(--ember); }
   //   hold a finger still, or put a second finger down ... grab (crates, levers); keep holding and drag to pull
   const TOUCH = new Map();
   // a touch jump is a full jump: hold the jump for its whole rise
-  const touchJump = () => { if (state !== "play") return; jumpQueued = true; pads.jump = true; clearTimeout(touchJump.t); touchJump.t = setTimeout(() => { pads.jump = false; }, 380); };
+  const touchJump = (dir = 0) => { if (state !== "play") return; jumpQueued = true; P.ropeJumpDir = dir; pads.jump = true; clearTimeout(touchJump.t); touchJump.t = setTimeout(() => { pads.jump = false; }, 380); };
   const gameCanvas = document.getElementById("game");
   function touchUpdate() {
     for (const k of ["left", "right", "up", "down", "grab"]) pads[k] = false;
@@ -1436,8 +1436,7 @@ h1 span { color: var(--ember); }
     e.preventDefault();
     if (typeof e.pointerId === "number") { try { gameCanvas.setPointerCapture(e.pointerId); } catch (_) {} }
     const now = performance.now();
-    const regrab = !!P.held || now - (touchEnd.heldAt || -1e9) < 700;
-    TOUCH.set(e.pointerId, { x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, t0: now, fy: e.clientY, ft: now, moved: 0, hold: regrab, flicked: false });
+    TOUCH.set(e.pointerId, { x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, t0: now, fy: e.clientY, fx: e.clientX, ft: now, moved: 0, hold: false, flicked: false });
     clearTimeout(touchStart.t);
     touchStart.t = setTimeout(() => { const q = TOUCH.get(e.pointerId); if (q && q.moved < 26 && !q.flicked) { q.hold = true; q.x0 = q.x; q.y0 = q.y; touchUpdate(); } }, 300);
     touchUpdate();
@@ -1452,16 +1451,16 @@ h1 span { color: var(--ember); }
     if (q.x - q.x0 > lim) q.x0 = q.x - lim; else if (q.x0 - q.x > lim) q.x0 = q.x + lim;
     // a quick upward flick jumps (on a rope, upward drags climb instead)
     const now = performance.now();
-    if (now - q.ft > 160) { q.fy = q.y; q.ft = now; }
-    if (!q.hold && !q.flicked && q.fy - q.y > (P.rope ? 60 : 38)) { q.flicked = true; touchJump(); q.y0 = q.y; }
+    if (now - q.ft > 160) { q.fy = q.y; q.fx = q.x; q.ft = now; }
+    if (!q.hold && !q.flicked && q.fy - q.y > (P.rope ? 60 : 38)) { q.flicked = true; const fx = q.x - q.fx; touchJump(Math.abs(fx) > 18 ? Math.sign(fx) : 0); q.y0 = q.y; }
     if (q.flicked && q.y - q.fy > 10) q.flicked = false;
     touchUpdate();
   }
   function touchEnd(e) {
     const q = TOUCH.get(e.pointerId); if (!q) return;
     TOUCH.delete(e.pointerId);
-    if (P.held && TOUCH.size === 0) touchEnd.heldAt = performance.now();
-    if (performance.now() - q.t0 < 280 && q.moved < 16 && !q.hold) touchJump();
+    if (TOUCH.size === 0) P.held = null;
+    if (performance.now() - q.t0 < 280 && q.moved < 16 && !q.hold) touchJump(P.rope ? (q.x < innerWidth / 2 ? -1 : 1) : 0);
     touchUpdate();
   }
   // real touch events on phones (an Android long-press can cancel pointer events and drop the grab)
@@ -1676,7 +1675,9 @@ h1 span { color: var(--ember); }
     }
 
     // ---- catch a rope in mid-air
+    if (P.onGround) P.lastRope = null;
     if (!P.onGround && P.ropeCD <= 0 && (playing || state === "intro")) for (const r of ROPES) {
+      if (r === P.lastRope) continue;   // after leaping off, this rope can't snatch him back
       const gripY = P.y + 1.12 * SC, s = r.top - gripY;
       if (s < 0.9 || s > r.len - 0.12) continue;
       const rx = r.x + Math.sin(r.ang) * s;
@@ -1758,8 +1759,9 @@ h1 span { color: var(--ember); }
     P.onGround = false; P.groundRef = null; coyote = 0;
     const letGo = () => { P.rope = null; P.ropeCD = 0.4; cut = true; };
     if (buffer > 0) {            // jump off
-      buffer = 0; letGo();
-      P.vx += (ix || P.facing) * 1.8; P.vy = Math.max(P.vy, 0) + JV * 0.75; sfx.jump();
+      const dir = ix || P.ropeJumpDir || P.facing; P.ropeJumpDir = 0;
+      buffer = 0; letGo(); P.lastRope = r; P.ropeCD = 0.25; P.facing = dir;
+      P.vx += dir * 1.8; if (P.vx * dir < 3.4) P.vx = dir * 3.4; P.vy = Math.max(P.vy, 0) + JV * 0.75; sfx.jump();
     } else if (down && P.ropeR >= r.len - 0.13) {   // slide off the bottom
       letGo(); P.vx *= 0.5; P.vy = -0.5;
     }
@@ -3562,7 +3564,7 @@ h1 span { color: var(--ember); }
     $("muteBtn").setAttribute("aria-label", AUD.muted ? "Turn sound on" : "Turn sound off");
     $("muteBtn").blur();
   });
-  if (isTouch) $("keyHelp").textContent = "Drag to move · flick up or tap to jump · hold your finger still to grab · v1.6";
+  if (isTouch) $("keyHelp").textContent = "Drag to move · flick up or tap to jump · hold your finger still to grab · v1.7";
 
   function buildLevelList() {
     const list = $("levelList");
