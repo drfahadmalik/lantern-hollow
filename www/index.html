@@ -193,7 +193,7 @@ h1 span { color: var(--ember); }
   </div>
 
   <section class="card" id="menuCard" aria-hidden="false">
-    <div class="eyebrow">A story in the dark <span class="ver">· v1.9</span></div>
+    <div class="eyebrow">A story in the dark <span class="ver">· v2.0</span></div>
     <h1>Lantern <span>Hollow</span></h1>
     <p>A small traveller, a lantern, and someone to find.</p>
     <div class="row">
@@ -741,7 +741,28 @@ h1 span { color: var(--ember); }
       howl: [14, 24],
     },
     {
-      key: "quarry", num: "Chapter six", name: "The Quarry",
+      key: "hollow", num: "Chapter six", name: "The Upside-Down Hollow",
+      look: { sky: ["#77848a", "#3c474c", "#0e1315"], sun: 0.3, sunCol: "206,220,232", rays: 0.35, tint: "rgba(52,66,84,0.5)", fog: 1.2, birds: false, flies: 8, leaves: 0.2 },
+      bounds: [0, 60], spawn: [1.5, 0],
+      ground: [[0, 10, 0], [10, 13, 1.2], [13, 16, 2.2], [33, 60, 0]],
+      spikes: [[16, 33, -3.0]], water: [], stones: [], logs: [], floats: [], swings: [], bridges: [],
+      roofs: [[12, 37, 6.2]],
+      pends: [{ x: 21, top: 6.2, len: 4.2, amp: 0.75, sp: 1.45, half: 0.8, brittle: 3.3 }],
+      flips: [{ cord: 24.7, hy: 5.0, ring: 34.4, ceil: 6.2, spikes: [12.4, 22.4] }],
+      boxes: [], plates: [],
+      checkpoints: [1, 13.5, 35.5],
+      seeds: [[5, 0.9], [14.5, 3.1], [29.5, 5.5], [46, 0.9]],
+      trees: [[3, 0, 0.85, 1], [50, 0, 0.9, 0]],
+      pillars: [[57, 0, 1.4, 3.0, 1]],
+      clues: [], ghosts: [],
+      hints: [
+        { x: 10.6, t: "That old rope is rotten. It won't hold you for long", ms: 4200 },
+        { x: 28.5, t: "Hold E by the iron ring to let go of the roof", tt: "Hold your finger still by the iron ring to let go of the roof", ms: 4800 },
+      ],
+      howl: [14, 24],
+    },
+    {
+      key: "quarry", num: "Chapter seven", name: "The Quarry",
       look: { sky: ["#a49c90", "#635d55", "#1a1816"], sun: 0.55, sunCol: "236,220,198", rays: 0.7, tint: "rgba(110,88,70,0.4)", fog: 1.05, birds: false, flies: 12, leaves: 0.4 },
       bounds: [0, 90], spawn: [1.5, 0],
       ground: [[0, 26, 0], [26, 44, 4.4], [44, 56, 0], [56, 66, 4.4], [72.5, 90, 4.4]],
@@ -762,7 +783,7 @@ h1 span { color: var(--ember); }
       howl: [14, 24],
     },
     {
-      key: "wolves", num: "Chapter seven", name: "Wolf Country",
+      key: "wolves", num: "Chapter eight", name: "Wolf Country",
       look: { sky: ["#64747f", "#33424a", "#0c1215"], sun: 0.6, sunCol: "214,226,240", moon: true, rays: 0.3, tint: "rgba(38,56,88,0.72)", fog: 0.95, birds: false, flies: 12, leaves: 0.8 },
       bounds: [-14, 106], spawn: [-4, 0],
       ground: [[-14, 10, 0], [15, 30, 0], [30, 60, 3.2], [61.9, 70, 2.4], [75, 84, 2.4], [90, 106, 2.4]],
@@ -790,7 +811,7 @@ h1 span { color: var(--ember); }
   function buildWorld(segs) {
     const W = { key: "world", num: "", name: "Lantern Hollow", ground: [], ropes: [], spikes: [], water: [], stones: [], logs: [], floats: [], swings: [], bridges: [], boxes: [], plates: [],
       checkpoints: [], seeds: [], trees: [], pillars: [], arches: [], murals: [], clues: [], ghosts: [], hints: [], chapters: [], chase: null, end: 1e9, howl: [12, 20],
-      traps: [], levers: [], lifts: [], lgates: [], boulders: [], wheels: [], blocks: [], pulleys: [], crushers: [] };
+      traps: [], levers: [], lifts: [], lgates: [], boulders: [], wheels: [], blocks: [], pulleys: [], crushers: [], roofs: [], pends: [], flips: [] };
     let endX = null, endY = 0;
     segs.forEach((s, si) => {
       const first = s.ground.slice().sort((a, b) => a[0] - b[0])[0];
@@ -820,6 +841,9 @@ h1 span { color: var(--ember); }
       for (const b of s.boxes) W.boxes.push(Array.isArray(b) ? [X(b[0]), Y(b[1])] : X(b));
       for (const p of s.plates) W.plates.push({ x: X(p.x), gate: p.gate != null ? X(p.gate) : null, h: p.h, y: p.y != null ? Y(p.y) : undefined });
       for (const p of s.pulleys || []) W.pulleys.push({ ...p, a: X(p.a), b: X(p.b), base: Y(p.base) });
+      for (const [l, r, y] of s.roofs || []) W.roofs.push([X(l), X(r), Y(y)]);
+      for (const p of s.pends || []) W.pends.push({ ...p, x: X(p.x), top: Y(p.top) });
+      for (const f of s.flips || []) W.flips.push({ ...f, cord: X(f.cord), hy: Y(f.hy), ring: X(f.ring), ceil: Y(f.ceil), spikes: [X(f.spikes[0]), X(f.spikes[1])] });
       for (const c of s.crushers || []) W.crushers.push({ ...c, x: X(c.x), floor: Y(c.floor), plate: c.plate != null ? c.plate + plateBase : undefined });
       for (const c of s.checkpoints) W.checkpoints.push(X(c));
       for (const [x, y] of s.seeds) W.seeds.push([X(x), Y(y)]);
@@ -892,7 +916,8 @@ h1 span { color: var(--ember); }
   let GROUND = [], STATICS = [], MOVERS = [], PLANKS = [], BRIDGES = [], BOXES = [], PLATES = [], GATES = [];
   let WATERS = [], STONES = [], LOGS = [], SPIKES = [], CHASMS = [], SEEDS = [], ACTIVE = [];
   let KILL_Y = -4.4, levelTime = 0, hinted = {};
-  let ROPES = [], SLOPES = [];
+  let ROPES = [], SLOPES = [], FLIPS = [];
+  const INV = { f: null, flash: 0 };
   const gH = (g, x) => g.t0 == null ? g.t : g.t0 + (g.t1 - g.t0) * clamp((x - g.l) / (g.r - g.l), 0, 1);
 
   function groundTopAt(x) {
@@ -948,12 +973,14 @@ h1 span { color: var(--ember); }
     LOGS = LV.logs.map(([l, r, b, t]) => ({ l, r, b, t }));
     const minTop = Math.min(...GROUND.map(g => g.t));
     KILL_Y = minTop - 2;
-    STATICS = GROUND.map(g => ({ l: g.l, r: g.r, b: -30, t: g.t })).concat(STONES, LOGS, (LV.blocks || []).map(([l, r, b, t]) => ({ l, r, b, t, block: true })), [
+    STATICS = GROUND.map(g => ({ l: g.l, r: g.r, b: -30, t: g.t })).concat(STONES, LOGS, (LV.blocks || []).map(([l, r, b, t]) => ({ l, r, b, t, block: true })), (LV.roofs || []).map(([l, r, y]) => ({ l, r, b: y, t: y + 30, roof: true })), [
       { l: LV.bounds[0] - 1, r: LV.bounds[0], b: -30, t: 40, wall: true },
       { l: LV.bounds[1], r: LV.bounds[1] + 1, b: -30, t: 40, wall: true },
     ]);
     MOVERS = LV.swings.map(s => ({ kind: "swing", base: s.x, amp: s.amp, sp: s.sp, ph: 0, half: s.half, t0: s.t, t: s.t, top: s.top, cx: s.x, l: s.x - s.half, r: s.x + s.half, b: s.t - 0.28 }))
-      .concat(LV.floats.map(f => ({ kind: "float", base: f.x, amp: f.amp, sp: f.sp, ph: f.ph, half: f.half, t0: f.t, t: f.t, cx: f.x, l: f.x - f.half, r: f.x + f.half, b: f.t - 0.4 })));
+      .concat(LV.floats.map(f => ({ kind: "float", base: f.x, amp: f.amp, sp: f.sp, ph: f.ph, half: f.half, t0: f.t, t: f.t, cx: f.x, l: f.x - f.half, r: f.x + f.half, b: f.t - 0.4 })))
+      .concat((LV.pends || []).map(p => ({ kind: "pend", base: p.x, top: p.top, len: p.len, amp: p.amp, sp: p.sp, ph: 0, half: p.half, brittle: p.brittle, t0: p.top - p.len, t: p.top - p.len, cx: p.x, l: p.x - p.half, r: p.x + p.half, b: p.top - p.len - 0.22, th: 0, load: 0, fall: false, vy: 0, gone: false, creakT: 0 })));
+    FLIPS = (LV.flips || []).map(f => ({ ...f, pulled: 0, ringK: 0 }));
     BRIDGES = LV.bridges.map(([l, r, t, sturdy]) => ({ l, r, t, sturdy }));
     PLANKS = [];
     for (const br of BRIDGES) {
@@ -993,7 +1020,7 @@ h1 span { color: var(--ember); }
     ACTIVE = STATICS.concat(MOVERS, PLANKS, GATES, PLUGS);
 
     cp = { x: LV.spawn[0], y: LV.spawn[1] };
-    Object.assign(P, { x: cp.x, y: cp.y, vx: 0, vy: 0, onGround: true, facing: 1, pushing: false, pulling: false, groundRef: null, held: null, rope: null, ledge: null, ropeCD: 0, autorun: false, talking: false, lastGroundY: cp.y, moveScale: 1, jumped: false });
+    Object.assign(P, { x: cp.x, y: cp.y, vx: 0, vy: 0, onGround: true, facing: 1, pushing: false, pulling: false, groundRef: null, held: null, rope: null, ledge: null, ropeCD: 0, autorun: false, talking: false, lastGroundY: cp.y, moveScale: 1, jumped: false, inv: false });
     WOLF.active = false; WOLF.done = false; WOLF.blocked = false;
     hinted = {}; deaths = 0; levelTime = 0; simT = 0;
     LANT.hx = null; SCARF.length = 0; puffs.length = 0; EYES.list.length = 0; BIRDS.length = 0;
@@ -1332,6 +1359,9 @@ h1 span { color: var(--ember); }
     resetMech2();
     for (const b of BOXES) { b.x = b.sx; b.y = b.sy; b.vy = 0; b.floating = false; }
     for (const p of PLANKS) { p.state = 0; p.dy = 0; p.vy = 0; p.rot = 0; p.timer = 0; p.wob = 0; }
+    for (const m of MOVERS) if (m.kind === "pend") Object.assign(m, { fall: false, gone: false, load: 0, vy: 0, creakT: 0 });
+    for (const f of FLIPS) { f.pulled = 0; f.ringK = 0; }
+    P.inv = false; INV.f = null;
     for (const pl of PLATES) { pl.pressed = false; if (pl.gate) { pl.gate.open = 0; pl.gate.b = pl.gate.base; pl.gate.t = pl.gate.base + pl.gate.h; } }
   }
 
@@ -1497,6 +1527,22 @@ h1 span { color: var(--ember); }
     for (const m of MOVERS) {
       const ocx = m.cx, ot = m.t;
       if (m.kind === "pulley") { m.vx = 0; continue; }
+      if (m.kind === "pend") {
+        if (m.gone) continue;
+        if (m.fall) { m.vy -= G * dt; m.t += m.vy * dt; m.th *= 1 - dt * 2; if (m.t < m.top - 40) m.gone = true; }
+        else { m.th = m.amp * Math.sin(simT * m.sp + m.ph); m.cx = m.base + m.len * Math.sin(m.th); m.t = m.top - m.len * Math.cos(m.th); }
+        m.l = m.cx - m.half; m.r = m.cx + m.half; m.b = m.t - 0.22;
+        m.vx = (m.cx - ocx) / dt;
+        if (P.groundRef === m) {
+          P.x += m.cx - ocx; P.y += m.t - ot;
+          if (!m.fall) {
+            m.load += dt; m.creakT -= dt;
+            if (m.creakT <= 0) { sfx.creak(); m.creakT = Math.max(0.18, 0.6 - m.load * 0.15); }
+            if (m.load > m.brittle) { m.fall = true; m.vy = 0; sfx.crack(); }
+          }
+        }
+        continue;
+      }
       m.cx = m.base + m.amp * Math.sin(simT * m.sp + m.ph);
       m.t = m.kind === "lift" ? moveTowards(m.t, (m.lever && m.lever.on) || (m.plateRef && m.plateRef.pressed) ? m.low : m.top0, m.speed * dt) : m.t0 + (m.kind === "float" ? 0.035 * Math.sin(simT * 1.4 + m.ph * 2) : 0);
       m.l = m.cx - m.half; m.r = m.cx + m.half; m.b = m.t - (m.kind === "float" ? 0.4 : 0.28);
@@ -1516,7 +1562,7 @@ h1 span { color: var(--ember); }
     for (const g of GATES) if (g.plates) gateMove(g, g.plates.every(q => q.pressed) ? 1 : 0, dt);
     mechStep(dt);
     mech2Step(dt);
-    ACTIVE = STATICS.concat(MOVERS, PLANKS.filter(p => p.state < 2), GATES, PLUGS, bsolid(), crusherRects());
+    ACTIVE = STATICS.concat(MOVERS.filter(m => !m.gone), PLANKS.filter(p => p.state < 2), GATES, PLUGS, bsolid(), crusherRects());
     if (state === "intro") introStep(dt);
     if (state === "ending") endingStep(dt);
     storyStep(dt);
@@ -1535,6 +1581,15 @@ h1 span { color: var(--ember); }
       r.ang += r.angV * dt;
     }
 
+    // with gravity turned over, the boy's physics run in a world mirrored about the roof, then mirror back
+    const invA = P.inv && INV.f ? INV.f.ceil : null;
+    let keepA, keepS, keepSl;
+    if (invA != null) {
+      const mr = o => ({ l: o.l, r: o.r, b: 2 * invA - o.t, t: 2 * invA - o.b, wall: o.wall });
+      keepA = ACTIVE; keepS = STATICS; keepSl = SLOPES;
+      ACTIVE = ACTIVE.map(mr); STATICS = STATICS.map(mr); SLOPES = [];
+      P.y = 2 * invA - P.y; P.vy = -P.vy; if (P.lastGroundY != null) P.lastGroundY = 2 * invA - P.lastGroundY;
+    }
     if (P.ledge) ledgeStep(dt);
     else if (P.rope) ropeStep(dt, ix, playing);
     else {
@@ -1672,7 +1727,7 @@ h1 span { color: var(--ember); }
     if (P.onGround) P.lastGroundY = P.y;
 
     // ---- grab a ledge when jumping into a high edge, then pull up (like LIMBO)
-    if (!P.onGround && !P.held && (playing || state === "intro")) {
+    if (!P.onGround && !P.held && !P.inv && (playing || state === "intro")) {
       const side = ix !== 0 ? ix : (Math.abs(P.vx) > 0.5 ? Math.sign(P.vx) : 0);
       if (side) for (const s of STATICS.concat(BOXES.map(bRect))) {
         if (s.wall) continue;
@@ -1687,7 +1742,7 @@ h1 span { color: var(--ember); }
 
     // ---- catch a rope in mid-air
     if (P.onGround) P.lastRope = null;
-    if (!P.onGround && P.ropeCD <= 0 && (playing || state === "intro")) for (const r of ROPES) {
+    if (!P.onGround && !P.inv && P.ropeCD <= 0 && (playing || state === "intro")) for (const r of ROPES) {
       if (r === P.lastRope) continue;   // after leaping off, this rope can't snatch him back
       const gripY = P.y + 1.12 * SC, s = r.top - gripY;
       if (s < 0.9 || s > r.len - 0.12) continue;
@@ -1700,6 +1755,12 @@ h1 span { color: var(--ember); }
       }
     }
     }
+    if (invA != null) {
+      ACTIVE = keepA; STATICS = keepS; SLOPES = keepSl;
+      P.y = 2 * invA - P.y; P.vy = -P.vy; if (P.lastGroundY != null) P.lastGroundY = 2 * invA - P.lastGroundY;
+      P.ledge = null;
+    }
+    flipStep(dt, playing);
     for (const p of PLANKS) if (p.state === 0 && P.groundRef === p) {
       if (p.sturdy) { if (p.wob <= 0) { p.wob = 1; sfx.creak(); } }
       else { p.state = 1; p.timer = 0.46; sfx.creak(); }
@@ -1725,13 +1786,13 @@ h1 span { color: var(--ember); }
       for (const sp of SPIKES) if (P.x > sp.l - 0.1 && P.x < sp.r + 0.1 && P.y < sp.y + 1.2) { die("spikes"); break; }
       if (!dying) for (const w of WATERS) if (P.x > w.l && P.x < w.r && P.y < w.y + 0.15) { die("water", w); break; }
       if (!dying && P.y < killYAt(P.x)) die("fall");
-      for (const c of LV.checkpoints) if (P.x > c && cp.x < c) {
+      for (const c of LV.checkpoints) if (P.x > c && cp.x < c && !P.inv) {
         cp = { x: c + 0.5, y: groundTopAt(c + 0.5) }; sfx.checkpoint();
         SAVE.cp = cp; SAVE.chap = Math.max(SAVE.chap || 0, chapterAt(cp.x)); SAVE.seeds = SEEDS.map(s => s.got ? 1 : 0); writeSave();
       }
       for (const sd of SEEDS) {
         if (sd.got) continue;
-        if (Math.hypot(sd.x - P.x, sd.y - (P.y + 0.45)) < 0.6) collect(sd);
+        if (Math.hypot(sd.x - P.x, sd.y - (P.y + (P.inv ? -0.45 : 0.45))) < 0.6) collect(sd);
       }
       if (LV.glowTree && P.x > LV.glowTree[0] - 9.5 && state === "play") startEnding();
     }
@@ -1748,6 +1809,33 @@ h1 span { color: var(--ember); }
     if (L.t > 0.16 && !L.snd) { L.snd = true; sfx.land(0.25); }
     P.vx = 0; P.vy = 0; P.onGround = false; P.facing = L.side; L.k = k;
     if (k >= 1) { P.ledge = null; P.y = L.top; P.onGround = true; P.lastGroundY = L.top; coyote = 0.1; }
+  }
+
+  // ---------- the upside-down hollow: a cord that turns gravity over, a ring that turns it back ----------
+  const flipSfx = up => { tone(up ? 70 : 52, 0.4, 1.1, "sine", up ? 120 : 30); noiseHit({ freq: 300, q: 0.4, gain: 0.25, decay: 1.0, rate: 0.5, type: "lowpass" }); };
+  function flipStep(dt, playing) {
+    INV.flash = Math.max(0, INV.flash - dt * 1.6);
+    for (const f of FLIPS) {
+      f.pulled = Math.max(0, f.pulled - dt * 0.15); f.ringK = Math.max(0, f.ringK - dt * 2);
+      if (!playing) continue;
+      if (!P.inv) {
+        // only a jump from the swinging plank gets your hands up to the cord's handle
+        const reach = f.hy - P.y;
+        if (!P.onGround && !P.rope && Math.abs(P.x - f.cord) < 0.5 && reach > 0.55 && reach < 1.5) {
+          P.inv = true; INV.f = f; P.y += PH; P.vy = Math.max(P.vy, 1); P.groundRef = null;
+          f.pulled = 1; INV.flash = 1; crashShake = Math.max(crashShake, 0.5); flipSfx(true); sfx.grab();
+          for (const m of MOVERS) if (m.kind === "pend" && !m.fall && Math.abs(m.base - f.cord) < 10) { m.fall = true; m.vy = 0; sfx.crack(); }
+        }
+      } else if (INV.f === f) {
+        if (P.onGround && Math.abs(P.x - f.ring) < 0.75 && (keys.grab || pads.grab)) {
+          P.inv = false; INV.f = null; P.y = f.ceil - PH - 0.02; P.vy = 0; P.groundRef = null;
+          f.ringK = 1; INV.flash = 0.8; flipSfx(false); sfx.grab();
+        } else if (state === "play" && !dying) {
+          if (P.onGround && P.x > f.spikes[0] && P.x < f.spikes[1]) die("spikes");
+          else if (P.y > f.ceil + 7) die("fall");
+        }
+      }
+    }
   }
 
   // ---------- rope: climb up/down, swing, jump off ----------
@@ -2132,7 +2220,7 @@ h1 span { color: var(--ember); }
 
   function respawn() {
     WOLF.active = false; WOLF.done = false; WOLF.blocked = false; WOLF.caught = false; CATCH.on = false; CATCH.fogK = 0;
-    P.x = cp.x; P.y = cp.y; P.vx = P.vy = 0; P.groundRef = null; P.held = null; P.rope = null; P.ledge = null; P.autorun = false;
+    P.x = cp.x; P.y = cp.y; P.vx = P.vy = 0; P.groundRef = null; P.held = null; P.rope = null; P.ledge = null; P.autorun = false; P.inv = false; INV.f = null;
     for (const r of ROPES) { r.ang = 0; r.angV = 0; }
     resetDynamic();
     LANT.hx = null; SCARF.length = 0;
@@ -2157,7 +2245,7 @@ h1 span { color: var(--ember); }
   function camGoal() {
     const halfW = cw / S / 2, minX = LV.bounds[0] + halfW, maxX = LV.bounds[1] - halfW;
     if (state === "intro" && INTRO.t < 20.6) return { x: clamp(-9.3, minX, maxX), y: 1.7 };
-    return { x: minX > maxX ? (LV.bounds[0] + LV.bounds[1]) / 2 : clamp(P.x + cam.look, minX, maxX), y: P.y + 1.4 };
+    return { x: minX > maxX ? (LV.bounds[0] + LV.bounds[1]) / 2 : clamp(P.x + cam.look, minX, maxX), y: P.inv ? P.y - 1.6 : P.y + 1.4 };
   }
   function snapCamera() { cam.look = 0; const g = camGoal(); cam.x = g.x; cam.y = g.y; }
   function updateCamera(dt) {
@@ -2426,6 +2514,7 @@ h1 span { color: var(--ember); }
     if (RIG.blinkT < -0.12) RIG.blinkT = 2.5 + Math.random() * 3.5;
     if (RIG.blinkT > 0) {
       const ex = eyeM.a * eyeL[0] + eyeM.c * eyeL[1] + eyeM.e, ey = eyeM.b * eyeL[0] + eyeM.d * eyeL[1] + eyeM.f, er = 0.09 * S * SC;
+      if (ctx.__raw) ctx.__raw(1, 0, 0, 1, 0, 0);
       ctx.globalCompositeOperation = "screen";
       const eg = ctx.createRadialGradient(ex, ey, 0, ex, ey, er);
       eg.addColorStop(0, "rgba(235,240,232,0.95)"); eg.addColorStop(0.22, "rgba(220,230,222,0.35)"); eg.addColorStop(1, "rgba(220,230,222,0)");
@@ -2618,6 +2707,48 @@ h1 span { color: var(--ember); }
       ctx.fillStyle = FRONT; ctx.beginPath(); ctx.moveTo(l - 0.05, t); ctx.lineTo(l + 0.25, t + 0.07); ctx.lineTo(r - 0.3, t + 0.04); ctx.lineTo(r + 0.04, t); ctx.fill();
     }
     ctx.setTransform(1, 0, 0, 1, 0, 0);
+  }
+  function drawRoofs(t) {
+    for (const [l, r, y] of LV.roofs || []) {
+      if (!inView(l - 2, r + 2)) continue;
+      worldTransform();
+      ctx.fillStyle = FRONT; ctx.beginPath();
+      ctx.moveTo(l - 0.6, y + 30); ctx.lineTo(l - 0.6, y + 1.2);
+      for (let x = l - 0.3, k = 0; x < r + 0.3; x += 0.55, k++) {
+        const j = ((k * 37) % 11) / 11;
+        ctx.lineTo(x, y + 0.08 * j);
+        if (k % 4 === 2) { ctx.lineTo(x + 0.12, y - 0.35 - 0.3 * j); ctx.lineTo(x + 0.24, y + 0.02); }   // drips of rock
+      }
+      ctx.lineTo(r + 0.6, y + 1.2); ctx.lineTo(r + 0.6, y + 30); ctx.closePath(); ctx.fill();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+    }
+    for (const f of FLIPS) {
+      if (!inView(f.spikes[0] - 2, f.ring + 2)) continue;
+      worldTransform(); ctx.fillStyle = FRONT;
+      // teeth on the roof, waiting for anyone who falls the wrong way
+      ctx.beginPath();
+      for (let x = f.spikes[0]; x < f.spikes[1] - 0.05; x += 0.22) { const h = 0.32 + 0.12 * Math.sin(x * 7.3); ctx.moveTo(x, f.ceil + 0.02); ctx.lineTo(x + 0.11, f.ceil - h); ctx.lineTo(x + 0.22, f.ceil + 0.02); }
+      ctx.fill();
+      // the cord, with a wooden handle; pulled, it snaps up toward the roof
+      const hy = f.hy + f.pulled * 0.9 + Math.sin(t * 1.3) * 0.01, sw = Math.sin(t * 0.9) * 0.05 * (1 - f.pulled);
+      ctx.strokeStyle = FRONT; ctx.lineWidth = 0.035;
+      ctx.beginPath(); ctx.moveTo(f.cord, f.ceil); ctx.quadraticCurveTo(f.cord + sw, (f.ceil + hy) / 2, f.cord + sw * 2, hy); ctx.stroke();
+      ctx.fillRect(f.cord + sw * 2 - 0.22, hy - 0.07, 0.44, 0.08);
+      ctx.fillRect(f.cord - 0.16, f.ceil - 0.08, 0.32, 0.1);
+      // the iron ring hanging from the roof on the far side
+      const rg = f.ringK * 0.18;
+      ctx.fillRect(f.ring - 0.06, f.ceil - 0.3 - rg, 0.12, 0.3 + rg);
+      ctx.lineWidth = 0.06; ctx.beginPath(); ctx.arc(f.ring, f.ceil - 0.5 - rg, 0.2, 0, TAU); ctx.stroke();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      if (P.inv && INV.f === f) {   // a faint glint shows where to let go
+        const k = 0.35 + 0.25 * Math.sin(t * 3);
+        ctx.globalCompositeOperation = "screen";
+        const g = ctx.createRadialGradient(SX(f.ring), SY(f.ceil - 0.5), 0, SX(f.ring), SY(f.ceil - 0.5), 0.8 * S);
+        g.addColorStop(0, `rgba(255,200,130,${0.3 * k})`); g.addColorStop(1, "rgba(255,180,90,0)");
+        ctx.fillStyle = g; ctx.fillRect(SX(f.ring) - 0.8 * S, SY(f.ceil - 0.5) - 0.8 * S, 1.6 * S, 1.6 * S);
+        ctx.globalCompositeOperation = "source-over";
+      }
+    }
   }
   function drawLogs() {
     for (const L of LOGS) {
@@ -3010,7 +3141,20 @@ h1 span { color: var(--ember); }
   function drawMovers(t) {
     for (const m of MOVERS) {
       if (!inView(m.l - 1, m.r + 1)) continue;
-      if (m.kind === "swing" || m.kind === "lift") {
+      if (m.kind === "pend") {
+        ctx.strokeStyle = FRONT; ctx.fillStyle = FRONT; ctx.lineWidth = Math.max(1, 0.035 * S);
+        if (!m.fall) for (const side of [-0.62, 0.62]) { ctx.beginPath(); ctx.moveTo(SX(m.base), SY(m.top)); ctx.lineTo(SX(m.cx + side), SY(m.t - 0.04)); ctx.stroke(); }
+        else { ctx.beginPath(); ctx.moveTo(SX(m.base), SY(m.top)); ctx.lineTo(SX(m.base + 0.15 * Math.sin(simT * 3)), SY(m.top - 1.3)); ctx.stroke(); }
+        if (!m.gone) {
+          worldTransform(); ctx.translate(m.cx, m.t); ctx.rotate(m.fall ? (m.top - m.len - m.t) * 0.12 : m.th * 0.35);
+          ctx.fillRect(-m.half, -0.22, m.half * 2, 0.22);
+          ctx.fillRect(-m.half + 0.08, -0.3, 0.1, 0.1); ctx.fillRect(m.half - 0.18, -0.3, 0.1, 0.1);
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          // fraying fibres at the knot as it gives
+          if (!m.fall && m.load > 0) { ctx.globalAlpha = Math.min(1, m.load / m.brittle); ctx.fillStyle = "rgba(170,150,120,0.8)"; ctx.fillRect(SX(m.base) - 2, SY(m.top - 0.25) - 2, 4, 4); ctx.globalAlpha = 1; }
+        }
+        ctx.fillStyle = FRONT; ctx.fillRect(SX(m.base - 0.12), SY(m.top + 0.02), 0.24 * S, 0.14 * S);
+      } else if (m.kind === "swing" || m.kind === "lift") {
         ctx.strokeStyle = FRONT; ctx.fillStyle = FRONT; ctx.lineWidth = Math.max(1, 0.035 * S);
         for (const side of [-0.7, 0.7]) { ctx.beginPath(); ctx.moveTo(SX(m.base + side), SY(m.top)); ctx.lineTo(SX(m.cx + side), SY(m.t - 0.04)); ctx.stroke(); }
         ctx.fillRect(SX(m.l), SY(m.t), (m.r - m.l) * S, (m.t - m.b) * S);
@@ -3488,6 +3632,7 @@ h1 span { color: var(--ember); }
 
     drawSeeds(t);
     drawMovers(t);
+    drawRoofs(t);
     drawChasms();
     drawPerch();
     drawWater(t, lastLantern);
@@ -3512,7 +3657,17 @@ h1 span { color: var(--ember); }
 
     let lantern;
     if (CATCH.on) { lantern = drawFallenBoy(t); drawWolf(t, dt); }
-    else { drawWolf(t, dt); lantern = drawPlayer(t, dt, wnd); }
+    else {
+      drawWolf(t, dt);
+      if (P.inv) {
+        const y0 = SY(P.y), raw = ctx.setTransform.bind(ctx);
+        ctx.__raw = raw;
+        ctx.setTransform = (a, b, c, d, e, f) => raw(a, -b, c, -d, e, 2 * y0 - f);
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        try { lantern = drawPlayer(t, dt, wnd); } finally { ctx.setTransform = raw; delete ctx.__raw; raw(1, 0, 0, 1, 0, 0); }
+        lantern = { ...lantern, y: 2 * y0 - lantern.y, wy: 2 * P.y - lantern.wy };
+      } else lantern = drawPlayer(t, dt, wnd);
+    }
     lastLantern = lantern;
     ctx.globalCompositeOperation = "screen";
     const r2 = 0.9 * S * lantern.fl;
@@ -3545,6 +3700,17 @@ h1 span { color: var(--ember); }
   let SAVE = { cp: null, chap: 0, done: false, seeds: [], clues: {} };
   try { const s = JSON.parse(localStorage.getItem(SAVE_KEY) || "null"); if (s && typeof s === "object") SAVE = Object.assign(SAVE, s); } catch (_) {}
   function writeSave() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(SAVE)); } catch (_) {} }
+  // saves from before the Upside-Down Hollow existed: shift progress past it so nobody lands in the wrong place
+  if (!SAVE.v) {
+    const hi = CHAPTERS.findIndex(c => c.key === "hollow"), H = CHAPTERS[hi];
+    if (H) {
+      const w = H.x1 - H.x0, firstSeed = WORLD.seeds.findIndex(([x]) => x >= H.x0), nSeeds = WORLD.seeds.filter(([x]) => x >= H.x0 && x < H.x1).length;
+      if (SAVE.cp && SAVE.cp.x != null && SAVE.cp.x >= H.x0) SAVE.cp = { x: SAVE.cp.x + w, y: SAVE.cp.y };
+      if ((SAVE.chap || 0) >= hi) SAVE.chap = (SAVE.chap || 0) + 1;
+      if (Array.isArray(SAVE.seeds) && SAVE.seeds.length > firstSeed) SAVE.seeds.splice(firstSeed, 0, ...new Array(nSeeds).fill(0));
+    }
+    SAVE.v = 2; writeSave();
+  }
 
   // ---------- UI ----------
   const $ = id => document.getElementById(id);
@@ -3575,7 +3741,7 @@ h1 span { color: var(--ember); }
     $("muteBtn").setAttribute("aria-label", AUD.muted ? "Turn sound on" : "Turn sound off");
     $("muteBtn").blur();
   });
-  if (isTouch) $("keyHelp").textContent = "Drag to move · flick up or tap to jump · hold your finger still to grab · v1.9";
+  if (isTouch) $("keyHelp").textContent = "Drag to move · flick up or tap to jump · hold your finger still to grab · v2.0";
 
   function buildLevelList() {
     const list = $("levelList");
