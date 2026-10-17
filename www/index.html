@@ -193,7 +193,7 @@ h1 span { color: var(--ember); }
   </div>
 
   <section class="card" id="menuCard" aria-hidden="false">
-    <div class="eyebrow">A story in the dark <span class="ver">· v1.8</span></div>
+    <div class="eyebrow">A story in the dark <span class="ver">· v1.9</span></div>
     <h1>Lantern <span>Hollow</span></h1>
     <p>A small traveller, a lantern, and someone to find.</p>
     <div class="row">
@@ -1283,7 +1283,14 @@ h1 span { color: var(--ember); }
       if (Math.abs(w.y - ow) > 1e-5 && Math.abs(P.x - (w.l + w.r) / 2) < 14) { w.sndT = (w.sndT || 0) - dt; if (w.sndT <= 0) { noiseHit({ freq: 400, q: 0.5, gain: 0.08, decay: 0.8, type: "lowpass" }); w.sndT = 0.7; } }
     }
   }
-  const crusherRects = () => CRUSHERS.map(c => ({ l: c.l, r: c.r, b: c.y, t: c.y + 1.4 }));
+  // the crusher's top is a moving floor: one rect per crusher that keeps its identity, and carries whoever stands on it
+  const crusherRects = () => CRUSHERS.map(c => {
+    const R = c.rect || (c.rect = { l: c.l, r: c.r, b: c.y, t: c.y + 1.4, crusher: true });
+    const nt = c.y + 1.4, d = nt - R.t;
+    if (P.groundRef === R && d !== 0 && !P.rope) { P.y += d; if (d < 0) P.vy = 0; }
+    R.l = c.l; R.r = c.r; R.b = c.y; R.t = nt;
+    return R;
+  });
   function drawPulleys(t) {
     for (const p of PULLEYS) {
       if (!inView(p.A.l - 1, p.B.r + 1)) continue;
@@ -3568,7 +3575,7 @@ h1 span { color: var(--ember); }
     $("muteBtn").setAttribute("aria-label", AUD.muted ? "Turn sound on" : "Turn sound off");
     $("muteBtn").blur();
   });
-  if (isTouch) $("keyHelp").textContent = "Drag to move · flick up or tap to jump · hold your finger still to grab · v1.8";
+  if (isTouch) $("keyHelp").textContent = "Drag to move · flick up or tap to jump · hold your finger still to grab · v1.9";
 
   function buildLevelList() {
     const list = $("levelList");
