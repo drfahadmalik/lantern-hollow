@@ -193,7 +193,7 @@ h1 span { color: var(--ember); }
   </div>
 
   <section class="card" id="menuCard" aria-hidden="false">
-    <div class="eyebrow">A story in the dark <span class="ver">· v2.1</span></div>
+    <div class="eyebrow">A story in the dark <span class="ver">· v2.2</span></div>
     <h1>Lantern <span>Hollow</span></h1>
     <p>A small traveller, a lantern, and someone to find.</p>
     <div class="row">
@@ -694,7 +694,27 @@ h1 span { color: var(--ember); }
       howl: [14, 24],
     },
     {
-      key: "mill", num: "Chapter four", name: "The Trapper's Mill",
+      key: "echo", num: "Chapter four", name: "The Echo Chamber",
+      look: { sky: ["#9a978d", "#5c5a53", "#161714"], sun: 0.42, sunCol: "214,224,236", rays: 0.6, tint: "rgba(92,96,110,0.42)", fog: 1.15, birds: false, flies: 10, leaves: 0.3 },
+      bounds: [0, 42], spawn: [1.5, 0],
+      ground: [[0, 42, 0]],
+      spikes: [], water: [], stones: [], logs: [], floats: [], swings: [], bridges: [],
+      boxes: [], plates: [{ x: 3.6, gate: 26, h: 3.3, latch: true }, { x: 22, gate: 26, h: 3.3, latch: true }],
+      orbs: [{ x: 10, rec: 5 }],
+      checkpoints: [1, 27],
+      seeds: [[7, 0.9], [16, 1.9], [34, 0.9]],
+      trees: [[38, 0, 0.9, 1]],
+      pillars: [[1, 0, 1.6, 3.8, 0], [18.5, 0, 1.6, 4.2, 1], [30, 0, 1.4, 3.2, 0]],
+      arches: [[13.5, 0, 3.2, 3.9]],
+      murals: [[6.5, 0]],
+      clues: [], ghosts: [],
+      hints: [
+        { x: 8.2, t: "Hold E by the glowing stone", tt: "Hold your finger still by the glowing stone", ms: 4200 },
+      ],
+      howl: [14, 24],
+    },
+    {
+      key: "mill", num: "Chapter five", name: "The Trapper's Mill",
       look: { sky: ["#aaa292", "#6b6658", "#1c1c17"], sun: 0.5, sunCol: "240,222,190", rays: 0.7, tint: "rgba(122,94,62,0.36)", fog: 1.05, birds: true, flies: 18, leaves: 1 },
       bounds: [0, 124], spawn: [1.5, 0],
       ground: [[0, 24, 0], [24, 40.85, 2.6], [43, 56, 5.6], [56, 70, 5.6, 1.0], [70, 74, 1.0], [75.8, 90, 1.0], [94, 124, 1.0]],
@@ -718,7 +738,7 @@ h1 span { color: var(--ember); }
       howl: [12, 22],
     },
     {
-      key: "sluice", num: "Chapter five", name: "The Sluice",
+      key: "sluice", num: "Chapter six", name: "The Sluice",
       look: { sky: ["#93a3a3", "#56666a", "#141b1d"], sun: 0.45, sunCol: "214,230,236", rays: 0.6, tint: "rgba(70,96,110,0.42)", fog: 1.15, birds: false, flies: 14, leaves: 0.5 },
       bounds: [0, 100], spawn: [1.5, 2.9],
       ground: [[0, 10, 2.9], [10, 17, -3.2], [17, 60, 3.4], [60, 76, 7.6], [82.5, 100, 7.6]],
@@ -741,7 +761,7 @@ h1 span { color: var(--ember); }
       howl: [14, 24],
     },
     {
-      key: "hollow", num: "Chapter six", name: "The Upside-Down Hollow",
+      key: "hollow", num: "Chapter seven", name: "The Upside-Down Hollow",
       look: { sky: ["#77848a", "#3c474c", "#0e1315"], sun: 0.3, sunCol: "206,220,232", rays: 0.35, tint: "rgba(52,66,84,0.5)", fog: 1.2, birds: false, flies: 8, leaves: 0.2 },
       bounds: [0, 60], spawn: [1.5, 0],
       ground: [[0, 10, 0], [10, 13, 1.2], [13, 16, 2.2], [33, 60, 0]],
@@ -762,7 +782,7 @@ h1 span { color: var(--ember); }
       howl: [14, 24],
     },
     {
-      key: "quarry", num: "Chapter seven", name: "The Quarry",
+      key: "quarry", num: "Chapter eight", name: "The Quarry",
       look: { sky: ["#a49c90", "#635d55", "#1a1816"], sun: 0.55, sunCol: "236,220,198", rays: 0.7, tint: "rgba(110,88,70,0.4)", fog: 1.05, birds: false, flies: 12, leaves: 0.4 },
       bounds: [0, 90], spawn: [1.5, 0],
       ground: [[0, 26, 0], [26, 44, 4.4], [44, 56, 0], [56, 66, 4.4], [72.5, 90, 4.4]],
@@ -783,7 +803,7 @@ h1 span { color: var(--ember); }
       howl: [14, 24],
     },
     {
-      key: "gallery", num: "Chapter eight", name: "The Dark Gallery",
+      key: "gallery", num: "Chapter nine", name: "The Dark Gallery",
       look: { sky: ["#4e565b", "#262d31", "#07090a"], sun: 0.18, sunCol: "196,206,214", rays: 0.15, tint: "rgba(30,38,48,0.62)", fog: 1.3, birds: false, flies: 4, leaves: 0.1 },
       bounds: [0, 56], spawn: [1.5, 0],
       ground: [[0, 22, 0], [22, 28, 1.6], [28, 56, 3.2]],
@@ -803,7 +823,7 @@ h1 span { color: var(--ember); }
       howl: [14, 24],
     },
     {
-      key: "wolves", num: "Chapter nine", name: "Wolf Country",
+      key: "wolves", num: "Chapter ten", name: "Wolf Country",
       look: { sky: ["#64747f", "#33424a", "#0c1215"], sun: 0.6, sunCol: "214,226,240", moon: true, rays: 0.3, tint: "rgba(38,56,88,0.72)", fog: 0.95, birds: false, flies: 12, leaves: 0.8 },
       bounds: [-14, 106], spawn: [-4, 0],
       ground: [[-14, 10, 0], [15, 30, 0], [30, 60, 3.2], [61.9, 70, 2.4], [75, 84, 2.4], [90, 106, 2.4]],
@@ -831,7 +851,7 @@ h1 span { color: var(--ember); }
   function buildWorld(segs) {
     const W = { key: "world", num: "", name: "Lantern Hollow", ground: [], ropes: [], spikes: [], water: [], stones: [], logs: [], floats: [], swings: [], bridges: [], boxes: [], plates: [],
       checkpoints: [], seeds: [], trees: [], pillars: [], arches: [], murals: [], clues: [], ghosts: [], hints: [], chapters: [], chase: null, end: 1e9, howl: [12, 20],
-      traps: [], levers: [], lifts: [], lgates: [], boulders: [], wheels: [], blocks: [], pulleys: [], crushers: [], roofs: [], pends: [], flips: [], galleries: [] };
+      traps: [], levers: [], lifts: [], lgates: [], boulders: [], wheels: [], blocks: [], pulleys: [], crushers: [], roofs: [], pends: [], flips: [], galleries: [], orbs: [] };
     let endX = null, endY = 0;
     segs.forEach((s, si) => {
       const first = s.ground.slice().sort((a, b) => a[0] - b[0])[0];
@@ -859,7 +879,8 @@ h1 span { color: var(--ember); }
       for (const w of s.swings) W.swings.push({ ...w, x: X(w.x), t: Y(w.t), top: Y(w.top) });
       for (const [l, r, t, st] of s.bridges) W.bridges.push([X(l), X(r), Y(t), st]);
       for (const b of s.boxes) W.boxes.push(Array.isArray(b) ? [X(b[0]), Y(b[1])] : X(b));
-      for (const p of s.plates) W.plates.push({ x: X(p.x), gate: p.gate != null ? X(p.gate) : null, h: p.h, y: p.y != null ? Y(p.y) : undefined });
+      for (const p of s.plates) W.plates.push({ x: X(p.x), gate: p.gate != null ? X(p.gate) : null, h: p.h, y: p.y != null ? Y(p.y) : undefined, latch: p.latch });
+      for (const o of s.orbs || []) W.orbs.push({ ...o, x: X(o.x) });
       for (const p of s.pulleys || []) W.pulleys.push({ ...p, a: X(p.a), b: X(p.b), base: Y(p.base) });
       for (const [l, r, y] of s.roofs || []) W.roofs.push([X(l), X(r), Y(y)]);
       for (const p of s.pends || []) W.pends.push({ ...p, x: X(p.x), top: Y(p.top) });
@@ -937,7 +958,8 @@ h1 span { color: var(--ember); }
   let GROUND = [], STATICS = [], MOVERS = [], PLANKS = [], BRIDGES = [], BOXES = [], PLATES = [], GATES = [];
   let WATERS = [], STONES = [], LOGS = [], SPIKES = [], CHASMS = [], SEEDS = [], ACTIVE = [];
   let KILL_Y = -4.4, levelTime = 0, hinted = {};
-  let ROPES = [], SLOPES = [], FLIPS = [], GALS = [];
+  let ROPES = [], SLOPES = [], FLIPS = [], GALS = [], ORBS = [];
+  let ECHO_DRAW = false;
   const INV = { f: null, flash: 0 };
   const gH = (g, x) => g.t0 == null ? g.t : g.t0 + (g.t1 - g.t0) * clamp((x - g.l) / (g.r - g.l), 0, 1);
 
@@ -1003,6 +1025,7 @@ h1 span { color: var(--ember); }
       .concat((LV.pends || []).map(p => ({ kind: "pend", base: p.x, top: p.top, len: p.len, amp: p.amp, sp: p.sp, ph: 0, half: p.half, brittle: p.brittle, t0: p.top - p.len, t: p.top - p.len, cx: p.x, l: p.x - p.half, r: p.x + p.half, b: p.top - p.len - 0.22, th: 0, load: 0, fall: false, vy: 0, gone: false, creakT: 0 })));
     FLIPS = (LV.flips || []).map(f => ({ ...f, pulled: 0, ringK: 0 }));
     GALS = (LV.galleries || []).map(galNew);
+    ORBS = (LV.orbs || []).map(o => ({ ...o, rec_len: o.rec, y: groundTopAt(o.x), st: "idle", t: 0, rec: [], k: 0, echo: null, glow: 0 }));
     BRIDGES = LV.bridges.map(([l, r, t, sturdy]) => ({ l, r, t, sturdy }));
     PLANKS = [];
     for (const br of BRIDGES) {
@@ -1014,7 +1037,7 @@ h1 span { color: var(--ember); }
       let gate = null;
       if (p.gate != null) {
         gate = GATES.find(g => Math.abs(g.x - p.gate) < 0.01);
-        if (!gate) { const base = groundTopAt(p.gate); gate = { x: p.gate, l: p.gate - 0.27, r: p.gate + 0.27, base, h: p.h, lift: 2.9, open: 0, b: base, t: base + p.h, sndT: 0, plates: [] }; GATES.push(gate); }
+        if (!gate) { const base = groundTopAt(p.gate); gate = { x: p.gate, l: p.gate - 0.27, r: p.gate + 0.27, base, h: p.h, lift: 2.9, open: 0, b: base, t: base + p.h, sndT: 0, plates: [], latch: !!p.latch, latched: false, both: 0 }; GATES.push(gate); }
       }
       const pl = { x: p.x, top: p.y != null ? p.y : groundTopAt(p.x), pressed: false, gate };
       if (gate) gate.plates.push(pl);
@@ -1385,7 +1408,8 @@ h1 span { color: var(--ember); }
     for (const f of FLIPS) { f.pulled = 0; f.ringK = 0; }
     P.inv = false; INV.f = null; P.lamp = null;
     for (const g of GALS) { if (g.lamp.st === "carried") { g.lamp.st = "floor"; g.lamp.y = groundTopAt(g.lamp.x); } if (!g.shadeGone) { g.shadeHP = 1; g.burn = 0; } }
-    for (const pl of PLATES) { pl.pressed = false; if (pl.gate) { pl.gate.open = 0; pl.gate.b = pl.gate.base; pl.gate.t = pl.gate.base + pl.gate.h; } }
+    for (const o of ORBS) { o.st = "idle"; o.echo = null; o.rec = []; }
+    for (const pl of PLATES) { pl.pressed = false; if (pl.gate && !pl.gate.latched) { pl.gate.open = 0; pl.gate.b = pl.gate.base; pl.gate.t = pl.gate.base + pl.gate.h; } }
   }
 
   // ---------- player physics ----------
@@ -1579,10 +1603,14 @@ h1 span { color: var(--ember); }
     }
     for (const pl of PLATES) {
       const onIt = y => Math.abs(y - pl.top) < 0.15;
-      const pressed = BOXES.some(b => Math.abs(b.x - pl.x) < 0.6 && onIt(b.y)) || (P.onGround && Math.abs(P.x - pl.x) < 0.6 && onIt(P.y));
+      const pressed = BOXES.some(b => Math.abs(b.x - pl.x) < 0.6 && onIt(b.y)) || (P.onGround && Math.abs(P.x - pl.x) < 0.6 && onIt(P.y)) || ORBS.some(o => o.echo && o.echo.f && o.echo.f.g && Math.abs(o.echo.f.x - pl.x) < 0.6 && onIt(o.echo.f.y));
       if (pressed !== pl.pressed) { pl.pressed = pressed; sfx.click(pressed); }
     }
-    for (const g of GATES) if (g.plates) gateMove(g, g.plates.every(q => q.pressed) ? 1 : 0, dt);
+    for (const g of GATES) if (g.plates) {
+      const all = g.plates.every(q => q.pressed);
+      if (g.latch && !g.latched) { g.both = all ? g.both + dt : 0; if (g.both > 1.0) { g.latched = true; mechSfx.leverBack(); sfx.click(true); for (const o of ORBS) if (o.echo) o.echo.fade = 1; } }
+      gateMove(g, all || g.latched ? 1 : 0, dt);
+    }
     mechStep(dt);
     mech2Step(dt);
     ACTIVE = STATICS.concat(MOVERS.filter(m => !m.gone), PLANKS.filter(p => p.state < 2), GATES, PLUGS, bsolid(), crusherRects());
@@ -1786,6 +1814,7 @@ h1 span { color: var(--ember); }
     }
     flipStep(dt, playing);
     galleryStep(dt, playing);
+    orbStep(dt, playing);
     for (const p of PLANKS) if (p.state === 0 && P.groundRef === p) {
       if (p.sturdy) { if (p.wob <= 0) { p.wob = 1; sfx.creak(); } }
       else { p.state = 1; p.timer = 0.46; sfx.creak(); }
@@ -1834,6 +1863,83 @@ h1 span { color: var(--ember); }
     if (L.t > 0.16 && !L.snd) { L.snd = true; sfx.land(0.25); }
     P.vx = 0; P.vy = 0; P.onGround = false; P.facing = L.side; L.k = k;
     if (k >= 1) { P.ledge = null; P.y = L.top; P.onGround = true; P.lastGroundY = L.top; coyote = 0.1; }
+  }
+
+  // ---------- the echo chamber: a stone that remembers five seconds of you ----------
+  function orbStep(dt, playing) {
+    for (const o of ORBS) {
+      o.glow = Math.max(0, o.glow - dt * 2);
+      const gateDone = GATES.some(g => g.latch && g.latched && Math.abs(g.x - o.x) < 30);
+      if (o.st !== "rec" && playing && !gateDone && P.onGround && (keys.grab || pads.grab) && Math.abs(P.x - o.x) < 0.8 && !o.lock) {
+        o.st = "rec"; o.t = 0; o.rec = []; o.echo = null; o.lock = true; o.glow = 1;
+        tone(660, 0.12, 1.4, "sine", 990); tone(440, 0.08, 1.6, "sine", 445);
+      }
+      if (!(keys.grab || pads.grab)) o.lock = false;
+      if (o.st === "rec") {
+        o.t += dt;
+        o.rec.push({ x: P.x, y: P.y, vx: P.vx, vy: P.vy, g: P.onGround, fc: P.facing, cr: !!P.crouch, rope: !!P.rope });
+        if (o.t >= o.rec_len || dying) {
+          if (dying) { o.st = "idle"; o.rec = []; continue; }
+          o.st = "play"; o.glow = 1;
+          o.echo = { i: 0, f: o.rec[0], rig: null, lant: null, fade: 0, blink: 1 };
+          tone(330, 0.12, 1.2, "sine", 220); noiseHit({ freq: 900, q: 0.6, gain: 0.12, decay: 0.8, rate: 0.7 });
+        }
+      } else if (o.st === "play" && o.echo) {
+        const e = o.echo;
+        e.i++;
+        if (e.i >= o.rec.length) { e.i = 0; e.blink = 1; e.rig = null; e.lant = null; }   // dissolves, and starts again from the stone
+        e.f = o.rec[e.i]; e.blink = Math.max(0, e.blink - dt * 3);
+        if (e.fade > 0) { e.fade += dt * 0.6; if (e.fade > 2) { o.echo = null; o.st = "idle"; } }
+      }
+    }
+  }
+  function drawOrbs(t) {
+    for (const o of ORBS) {
+      if (!inView(o.x - 3, o.x + 3)) continue;
+      worldTransform(); ctx.fillStyle = FRONT;
+      // a waist-high stone with a socket on top
+      ctx.beginPath(); ctx.moveTo(o.x - 0.32, o.y); ctx.lineTo(o.x - 0.24, o.y + 0.9); ctx.lineTo(o.x - 0.3, o.y + 1.0); ctx.lineTo(o.x + 0.3, o.y + 1.0); ctx.lineTo(o.x + 0.24, o.y + 0.9); ctx.lineTo(o.x + 0.32, o.y); ctx.fill();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      const rec = o.st === "rec", left = rec ? 1 - o.t / o.rec_len : 1;
+      const pulse = 0.75 + 0.25 * Math.sin(t * (rec ? 9 : 2));
+      const cx = SX(o.x), cy = SY(o.y + 1.2), r = 0.17 * S;
+      ctx.globalCompositeOperation = "screen";
+      const gr = (1.2 + o.glow * 1.5) * S, g = ctx.createRadialGradient(cx, cy, 0, cx, cy, gr);
+      g.addColorStop(0, `rgba(180,214,255,${0.45 * pulse * (0.4 + 0.6 * left)})`); g.addColorStop(1, "rgba(150,190,255,0)");
+      ctx.fillStyle = g; ctx.fillRect(cx - gr, cy - gr, gr * 2, gr * 2);
+      ctx.fillStyle = `rgba(214,232,255,${0.6 + 0.4 * pulse})`; ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.fill();
+      if (rec) {   // the ring of light runs down like sand in a glass
+        ctx.strokeStyle = "rgba(214,232,255,0.8)"; ctx.lineWidth = Math.max(1.5, 0.04 * S);
+        ctx.beginPath(); ctx.arc(cx, cy, r * 1.9, -Math.PI / 2, -Math.PI / 2 + TAU * left); ctx.stroke();
+      }
+      ctx.globalCompositeOperation = "source-over";
+    }
+  }
+  // the echo is the boy himself, drawn from a recording: swap his state in, draw faintly, swap back
+  function drawEchoes(t, dt) {
+    for (const o of ORBS) {
+      const e = o.echo; if (!e || !e.f || !inView(e.f.x - 2, e.f.x + 2)) continue;
+      const keepP = { ...P }, keepR = { ...RIG }, keepL = { ...LANT }, keepS = SCARF.slice();
+      Object.assign(P, { x: e.f.x, y: e.f.y, vx: e.f.vx, vy: e.f.vy, onGround: e.f.g, facing: e.f.fc, crouch: e.f.cr, held: null, lamp: null, rope: null, ledge: null, pushing: false, pulling: false, talking: false, inv: false });
+      if (e.rig) Object.assign(RIG, e.rig);
+      if (e.lant) Object.assign(LANT, e.lant); else LANT.hx = null;
+      SCARF.length = 0; if (e.scarf) SCARF.push(...e.scarf);
+      ECHO_DRAW = true;
+      ctx.save(); ctx.globalAlpha = (0.42 + 0.08 * Math.sin(t * 5)) * (1 - e.blink) * (e.fade > 0 ? Math.max(0, 1 - e.fade / 2) : 1);
+      const al = ctx.globalAlpha;
+      try {
+        drawPlayer(t, dt, 0);
+        // a cold glow marks it as an echo, not a boy
+        ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = al; ctx.globalCompositeOperation = "screen";
+        const hx = SX(e.f.x), hy = SY(e.f.y + 0.5), hr = 0.9 * S, hg = ctx.createRadialGradient(hx, hy, 0, hx, hy, hr);
+        hg.addColorStop(0, "rgba(150,190,255,0.35)"); hg.addColorStop(1, "rgba(150,190,255,0)");
+        ctx.fillStyle = hg; ctx.fillRect(hx - hr, hy - hr, hr * 2, hr * 2); ctx.globalCompositeOperation = "source-over";
+      } finally {
+        ctx.restore(); ECHO_DRAW = false;
+        e.rig = { ...RIG }; e.lant = { ...LANT }; e.scarf = SCARF.slice();
+        Object.assign(P, keepP); Object.assign(RIG, keepR); Object.assign(LANT, keepL); SCARF.length = 0; SCARF.push(...keepS);
+      }
+    }
   }
 
   // ---------- the dark gallery: a heavy lamp, a pulley, a mirror, and a shadow that fears real light ----------
@@ -2475,7 +2581,7 @@ h1 span { color: var(--ember); }
     const stepIdx = Math.floor(RIG.uTot * 2);
     if (stepIdx !== RIG.lastStep) {
       RIG.lastStep = stepIdx;
-      if (P.onGround && w > 0.5) { puff(P.x + P.facing * 0.1, P.y, rn > 0.5 ? 4 : 2, 0.08 + 0.1 * rn, { spread: 0.15 }); sfx.step(0.35 + 0.65 * rn); }
+      if (P.onGround && w > 0.5 && !ECHO_DRAW) { puff(P.x + P.facing * 0.1, P.y, rn > 0.5 ? 4 : 2, 0.08 + 0.1 * rn, { spread: 0.15 }); sfx.step(0.35 + 0.65 * rn); }
     }
 
     // idle: now and then look around
@@ -3848,6 +3954,7 @@ h1 span { color: var(--ember); }
     drawSeeds(t);
     drawMovers(t);
     drawRoofs(t);
+    drawOrbs(t);
     drawGallery(t, false);
     drawChasms();
     drawPerch();
@@ -3872,6 +3979,7 @@ h1 span { color: var(--ember); }
     drawPuffs(dt);
 
     let lantern;
+    drawEchoes(t, dt);
     if (CATCH.on) { lantern = drawFallenBoy(t); drawWolf(t, dt); }
     else {
       drawWolf(t, dt);
@@ -3917,26 +4025,24 @@ h1 span { color: var(--ember); }
   let SAVE = { cp: null, chap: 0, done: false, seeds: [], clues: {} };
   try { const s = JSON.parse(localStorage.getItem(SAVE_KEY) || "null"); if (s && typeof s === "object") SAVE = Object.assign(SAVE, s); } catch (_) {}
   function writeSave() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(SAVE)); } catch (_) {} }
-  // saves from before the Upside-Down Hollow existed: shift progress past it so nobody lands in the wrong place
-  if (!SAVE.v) {
-    const hi = CHAPTERS.findIndex(c => c.key === "hollow"), H = CHAPTERS[hi];
-    if (H) {
-      const w = H.x1 - H.x0, firstSeed = WORLD.seeds.findIndex(([x]) => x >= H.x0), nSeeds = WORLD.seeds.filter(([x]) => x >= H.x0 && x < H.x1).length;
-      if (SAVE.cp && SAVE.cp.x != null && SAVE.cp.x >= H.x0) SAVE.cp = { x: SAVE.cp.x + w, y: SAVE.cp.y };
-      if ((SAVE.chap || 0) >= hi) SAVE.chap = (SAVE.chap || 0) + 1;
-      if (Array.isArray(SAVE.seeds) && SAVE.seeds.length > firstSeed) SAVE.seeds.splice(firstSeed, 0, ...new Array(nSeeds).fill(0));
+  // older saves: chapters were added along the trail since; replay each insertion, in the order it happened
+  {
+    const INSERTS = [[2, "hollow"], [3, "gallery"], [4, "echo"]], sv = SAVE.v || 1;
+    const chOf = k => CHAPTERS.find(c => c.key === k), idxOf = k => CHAPTERS.findIndex(c => c.key === k);
+    const seedsIn = c => WORLD.seeds.filter(([x]) => x >= c.x0 && x < c.x1).length;
+    for (const [ver, key] of INSERTS) {
+      if (ver <= sv) continue;
+      const C = chOf(key); if (!C) continue;
+      // where this chapter sat in the world of its own day: later additions before it did not exist yet
+      const later = INSERTS.filter(([v2, k2]) => v2 > ver && chOf(k2) && chOf(k2).x0 < C.x0).map(([, k2]) => chOf(k2));
+      const x0 = C.x0 - later.reduce((a, c) => a + (c.x1 - c.x0), 0), w = C.x1 - C.x0;
+      const firstSeed = WORLD.seeds.findIndex(([x]) => x >= C.x0) - later.reduce((a, c) => a + seedsIn(c), 0);
+      const ci = idxOf(key) - later.length;
+      if (SAVE.cp && SAVE.cp.x != null && SAVE.cp.x >= x0) SAVE.cp = { x: SAVE.cp.x + w, y: SAVE.cp.y };
+      if ((SAVE.chap || 0) >= ci) SAVE.chap = (SAVE.chap || 0) + 1;
+      if (Array.isArray(SAVE.seeds) && SAVE.seeds.length > firstSeed) SAVE.seeds.splice(firstSeed, 0, ...new Array(seedsIn(C)).fill(0));
     }
-    SAVE.v = 2; writeSave();
-  }
-  if (SAVE.v < 3) {
-    const gi = CHAPTERS.findIndex(c => c.key === "gallery"), Gc = CHAPTERS[gi];
-    if (Gc) {
-      const w = Gc.x1 - Gc.x0, firstSeed = WORLD.seeds.findIndex(([x]) => x >= Gc.x0), nSeeds = WORLD.seeds.filter(([x]) => x >= Gc.x0 && x < Gc.x1).length;
-      if (SAVE.cp && SAVE.cp.x != null && SAVE.cp.x >= Gc.x0) SAVE.cp = { x: SAVE.cp.x + w, y: SAVE.cp.y };
-      if ((SAVE.chap || 0) >= gi) SAVE.chap = (SAVE.chap || 0) + 1;
-      if (Array.isArray(SAVE.seeds) && SAVE.seeds.length > firstSeed) SAVE.seeds.splice(firstSeed, 0, ...new Array(nSeeds).fill(0));
-    }
-    SAVE.v = 3; writeSave();
+    if (sv < 4) { SAVE.v = 4; writeSave(); }
   }
 
   // ---------- UI ----------
@@ -3968,7 +4074,7 @@ h1 span { color: var(--ember); }
     $("muteBtn").setAttribute("aria-label", AUD.muted ? "Turn sound on" : "Turn sound off");
     $("muteBtn").blur();
   });
-  if (isTouch) $("keyHelp").textContent = "Drag to move · flick up or tap to jump · hold your finger still to grab · v2.1";
+  if (isTouch) $("keyHelp").textContent = "Drag to move · flick up or tap to jump · hold your finger still to grab · v2.2";
 
   function buildLevelList() {
     const list = $("levelList");
