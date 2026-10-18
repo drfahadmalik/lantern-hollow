@@ -193,7 +193,7 @@ h1 span { color: var(--ember); }
   </div>
 
   <section class="card" id="menuCard" aria-hidden="false">
-    <div class="eyebrow">A story in the dark <span class="ver">· v2.0</span></div>
+    <div class="eyebrow">A story in the dark <span class="ver">· v2.1</span></div>
     <h1>Lantern <span>Hollow</span></h1>
     <p>A small traveller, a lantern, and someone to find.</p>
     <div class="row">
@@ -783,7 +783,27 @@ h1 span { color: var(--ember); }
       howl: [14, 24],
     },
     {
-      key: "wolves", num: "Chapter eight", name: "Wolf Country",
+      key: "gallery", num: "Chapter eight", name: "The Dark Gallery",
+      look: { sky: ["#4e565b", "#262d31", "#07090a"], sun: 0.18, sunCol: "196,206,214", rays: 0.15, tint: "rgba(30,38,48,0.62)", fog: 1.3, birds: false, flies: 4, leaves: 0.1 },
+      bounds: [0, 56], spawn: [1.5, 0],
+      ground: [[0, 22, 0], [22, 28, 1.6], [28, 56, 3.2]],
+      spikes: [], water: [], stones: [], logs: [], floats: [], swings: [], bridges: [],
+      roofs: [[6, 46, 6.4]],
+      gallery: { lamp: 5.5, hook: 13, pivot: [13, 5.9], len: 1.6, aim: -0.5133, mirror: [18.5, 0], mirrorA: 0.2411, shade: [31.6, 3.2] },
+      boxes: [], plates: [],
+      checkpoints: [1, 14, 36],
+      seeds: [[3.5, 0.9], [15.5, 0.9], [25, 2.5], [44, 4.1]],
+      trees: [[2, 0, 0.85, 1], [50, 3.2, 0.9, 0]],
+      pillars: [[9, 0, 1.4, 3.2, 0], [40, 3.2, 1.5, 3.4, 1]],
+      clues: [], ghosts: [],
+      hints: [
+        { x: 4.2, t: "Hold E to lift the heavy lamp", tt: "Hold your finger still to lift the heavy lamp", ms: 4200 },
+        { x: 17.2, t: "Hold E by the mirror, then Up or Down to turn it", tt: "Hold your finger still by the mirror, then drag up or down to turn it", ms: 5200 },
+      ],
+      howl: [14, 24],
+    },
+    {
+      key: "wolves", num: "Chapter nine", name: "Wolf Country",
       look: { sky: ["#64747f", "#33424a", "#0c1215"], sun: 0.6, sunCol: "214,226,240", moon: true, rays: 0.3, tint: "rgba(38,56,88,0.72)", fog: 0.95, birds: false, flies: 12, leaves: 0.8 },
       bounds: [-14, 106], spawn: [-4, 0],
       ground: [[-14, 10, 0], [15, 30, 0], [30, 60, 3.2], [61.9, 70, 2.4], [75, 84, 2.4], [90, 106, 2.4]],
@@ -811,7 +831,7 @@ h1 span { color: var(--ember); }
   function buildWorld(segs) {
     const W = { key: "world", num: "", name: "Lantern Hollow", ground: [], ropes: [], spikes: [], water: [], stones: [], logs: [], floats: [], swings: [], bridges: [], boxes: [], plates: [],
       checkpoints: [], seeds: [], trees: [], pillars: [], arches: [], murals: [], clues: [], ghosts: [], hints: [], chapters: [], chase: null, end: 1e9, howl: [12, 20],
-      traps: [], levers: [], lifts: [], lgates: [], boulders: [], wheels: [], blocks: [], pulleys: [], crushers: [], roofs: [], pends: [], flips: [] };
+      traps: [], levers: [], lifts: [], lgates: [], boulders: [], wheels: [], blocks: [], pulleys: [], crushers: [], roofs: [], pends: [], flips: [], galleries: [] };
     let endX = null, endY = 0;
     segs.forEach((s, si) => {
       const first = s.ground.slice().sort((a, b) => a[0] - b[0])[0];
@@ -844,6 +864,7 @@ h1 span { color: var(--ember); }
       for (const [l, r, y] of s.roofs || []) W.roofs.push([X(l), X(r), Y(y)]);
       for (const p of s.pends || []) W.pends.push({ ...p, x: X(p.x), top: Y(p.top) });
       for (const f of s.flips || []) W.flips.push({ ...f, cord: X(f.cord), hy: Y(f.hy), ring: X(f.ring), ceil: Y(f.ceil), spikes: [X(f.spikes[0]), X(f.spikes[1])] });
+      if (s.gallery) { const g = s.gallery; W.galleries.push({ lamp: X(g.lamp), hook: X(g.hook), pivot: [X(g.pivot[0]), Y(g.pivot[1])], len: g.len, aim: g.aim, mirror: [X(g.mirror[0]), Y(g.mirror[1])], mirrorA: g.mirrorA, shade: [X(g.shade[0]), Y(g.shade[1])] }); }
       for (const c of s.crushers || []) W.crushers.push({ ...c, x: X(c.x), floor: Y(c.floor), plate: c.plate != null ? c.plate + plateBase : undefined });
       for (const c of s.checkpoints) W.checkpoints.push(X(c));
       for (const [x, y] of s.seeds) W.seeds.push([X(x), Y(y)]);
@@ -916,7 +937,7 @@ h1 span { color: var(--ember); }
   let GROUND = [], STATICS = [], MOVERS = [], PLANKS = [], BRIDGES = [], BOXES = [], PLATES = [], GATES = [];
   let WATERS = [], STONES = [], LOGS = [], SPIKES = [], CHASMS = [], SEEDS = [], ACTIVE = [];
   let KILL_Y = -4.4, levelTime = 0, hinted = {};
-  let ROPES = [], SLOPES = [], FLIPS = [];
+  let ROPES = [], SLOPES = [], FLIPS = [], GALS = [];
   const INV = { f: null, flash: 0 };
   const gH = (g, x) => g.t0 == null ? g.t : g.t0 + (g.t1 - g.t0) * clamp((x - g.l) / (g.r - g.l), 0, 1);
 
@@ -981,6 +1002,7 @@ h1 span { color: var(--ember); }
       .concat(LV.floats.map(f => ({ kind: "float", base: f.x, amp: f.amp, sp: f.sp, ph: f.ph, half: f.half, t0: f.t, t: f.t, cx: f.x, l: f.x - f.half, r: f.x + f.half, b: f.t - 0.4 })))
       .concat((LV.pends || []).map(p => ({ kind: "pend", base: p.x, top: p.top, len: p.len, amp: p.amp, sp: p.sp, ph: 0, half: p.half, brittle: p.brittle, t0: p.top - p.len, t: p.top - p.len, cx: p.x, l: p.x - p.half, r: p.x + p.half, b: p.top - p.len - 0.22, th: 0, load: 0, fall: false, vy: 0, gone: false, creakT: 0 })));
     FLIPS = (LV.flips || []).map(f => ({ ...f, pulled: 0, ringK: 0 }));
+    GALS = (LV.galleries || []).map(galNew);
     BRIDGES = LV.bridges.map(([l, r, t, sturdy]) => ({ l, r, t, sturdy }));
     PLANKS = [];
     for (const br of BRIDGES) {
@@ -1020,7 +1042,7 @@ h1 span { color: var(--ember); }
     ACTIVE = STATICS.concat(MOVERS, PLANKS, GATES, PLUGS);
 
     cp = { x: LV.spawn[0], y: LV.spawn[1] };
-    Object.assign(P, { x: cp.x, y: cp.y, vx: 0, vy: 0, onGround: true, facing: 1, pushing: false, pulling: false, groundRef: null, held: null, rope: null, ledge: null, ropeCD: 0, autorun: false, talking: false, lastGroundY: cp.y, moveScale: 1, jumped: false, inv: false });
+    Object.assign(P, { x: cp.x, y: cp.y, vx: 0, vy: 0, onGround: true, facing: 1, pushing: false, pulling: false, groundRef: null, held: null, rope: null, ledge: null, ropeCD: 0, autorun: false, talking: false, lastGroundY: cp.y, moveScale: 1, jumped: false, inv: false, lamp: null });
     WOLF.active = false; WOLF.done = false; WOLF.blocked = false;
     hinted = {}; deaths = 0; levelTime = 0; simT = 0;
     LANT.hx = null; SCARF.length = 0; puffs.length = 0; EYES.list.length = 0; BIRDS.length = 0;
@@ -1361,7 +1383,8 @@ h1 span { color: var(--ember); }
     for (const p of PLANKS) { p.state = 0; p.dy = 0; p.vy = 0; p.rot = 0; p.timer = 0; p.wob = 0; }
     for (const m of MOVERS) if (m.kind === "pend") Object.assign(m, { fall: false, gone: false, load: 0, vy: 0, creakT: 0 });
     for (const f of FLIPS) { f.pulled = 0; f.ringK = 0; }
-    P.inv = false; INV.f = null;
+    P.inv = false; INV.f = null; P.lamp = null;
+    for (const g of GALS) { if (g.lamp.st === "carried") { g.lamp.st = "floor"; g.lamp.y = groundTopAt(g.lamp.x); } if (!g.shadeGone) { g.shadeHP = 1; g.burn = 0; } }
     for (const pl of PLATES) { pl.pressed = false; if (pl.gate) { pl.gate.open = 0; pl.gate.b = pl.gate.base; pl.gate.t = pl.gate.base + pl.gate.h; } }
   }
 
@@ -1425,7 +1448,7 @@ h1 span { color: var(--ember); }
     const k = KEYMAP[e.code]; if (!k) return;
     if (state === "play" || state === "intro") e.preventDefault();
     if (k === "jump" && !keys.jump) jumpQueued = true;
-    if (k === "up" && !keys.up && !P.rope) jumpQueued = true;
+    if (k === "up" && !keys.up && !P.rope && !((keys.grab) && nearMirror())) jumpQueued = true;
     keys[k] = true;
   });
   addEventListener("keyup", e => { const k = KEYMAP[e.code]; if (k) keys[k] = false; });
@@ -1469,7 +1492,7 @@ h1 span { color: var(--ember); }
     const dx = mv.x - mv.x0, dy = p.y - p.y0, dead = grabbing ? 9 : 16;
     if (dx > dead) pads.right = true; else if (dx < -dead) pads.left = true;
     if (dy > 34) pads.down = true;
-    if (P.rope && dy < -34) pads.up = true;
+    if ((P.rope || (grabbing && nearMirror())) && dy < -34) pads.up = true;
     pads.grab = grabbing;
   }
   function touchStart(e) {
@@ -1493,7 +1516,7 @@ h1 span { color: var(--ember); }
     // a quick upward flick jumps (on a rope, upward drags climb instead)
     const now = performance.now();
     if (now - q.ft > 160) { q.fy = q.y; q.fx = q.x; q.ft = now; }
-    if (!q.hold && !q.flicked && q.fy - q.y > (P.rope ? 60 : 38)) { q.flicked = true; const fx = q.x - q.fx; touchJump(Math.abs(fx) > 18 ? Math.sign(fx) : 0); q.y0 = q.y; }
+    if (!q.hold && !(TOUCH.size > 1 && nearMirror()) && !q.flicked && q.fy - q.y > (P.rope ? 60 : 38)) { q.flicked = true; const fx = q.x - q.fx; touchJump(Math.abs(fx) > 18 ? Math.sign(fx) : 0); q.y0 = q.y; }
     if (q.flicked && q.y - q.fy > 10) q.flicked = false;
     touchUpdate();
   }
@@ -1570,6 +1593,7 @@ h1 span { color: var(--ember); }
     const playing = state === "play" && !dying;
     let ix = playing ? ((keys.left || pads.left ? -1 : 0) + (keys.right || pads.right ? 1 : 0)) : 0;
     if (state === "intro") ix = INTRO.ix;
+    if (GALS.some(g => g.adjust)) ix = 0;
     if (state === "ending") ix = END.ix;
     if (playing && P.autorun) { if (ix !== 0 || P.x > 1) P.autorun = false; else ix = 1; }
     const held = playing && (keys.jump || pads.jump || (!P.rope && keys.up));
@@ -1608,7 +1632,7 @@ h1 span { color: var(--ember); }
 
     // ---- movement state decides the target speed (run / push / pull / slope / special effects)
     const slope = P.onGround && P.groundRef && P.groundRef.slope ? P.groundRef : null;
-    let targetV = ix * MOVE.run * (P.moveScale == null ? 1 : P.moveScale);
+    let targetV = ix * MOVE.run * (P.moveScale == null ? 1 : P.moveScale) * (P.lamp ? 0.42 : 1);
     P.crouch = playing && P.onGround && !P.held && (keys.down || pads.down);
     if (P.held) targetV *= Math.sign(ix) === P.holdSide ? MOVE.push : MOVE.pull;
     else if (P.crouch) targetV *= MOVE.crouch;
@@ -1644,7 +1668,7 @@ h1 span { color: var(--ember); }
         const sp = Math.abs(P.vx);
         P.vx = Math.sign(ix) * Math.min(MOVE.airMax, sp + MOVE.jumpBoost * clamp(sp / MOVE.run, 0, 1));
       }
-      P.vy = JV; buffer = 0; coyote = 0; P.onGround = false; cut = false; P.groundRef = null; P.jumped = true; sfx.jump();
+      P.vy = JV * (P.lamp ? 0.66 : 1); buffer = 0; coyote = 0; P.onGround = false; cut = false; P.groundRef = null; P.jumped = true; sfx.jump();
     }
     if (!held && !cut && P.vy > 0 && !P.onGround) { P.vy *= 0.45; cut = true; }
     P.vy = Math.max(P.vy - G * (P.vy < 0 ? MOVE.fallGravity : 1) * dt, -22);
@@ -1761,6 +1785,7 @@ h1 span { color: var(--ember); }
       P.ledge = null;
     }
     flipStep(dt, playing);
+    galleryStep(dt, playing);
     for (const p of PLANKS) if (p.state === 0 && P.groundRef === p) {
       if (p.sturdy) { if (p.wob <= 0) { p.wob = 1; sfx.creak(); } }
       else { p.state = 1; p.timer = 0.46; sfx.creak(); }
@@ -1809,6 +1834,105 @@ h1 span { color: var(--ember); }
     if (L.t > 0.16 && !L.snd) { L.snd = true; sfx.land(0.25); }
     P.vx = 0; P.vy = 0; P.onGround = false; P.facing = L.side; L.k = k;
     if (k >= 1) { P.ledge = null; P.y = L.top; P.onGround = true; P.lastGroundY = L.top; coyote = 0.1; }
+  }
+
+  // ---------- the dark gallery: a heavy lamp, a pulley, a mirror, and a shadow that fears real light ----------
+  function galNew(g) {
+    return { ...g, lamp: { x: g.lamp, y: groundTopAt(g.lamp), st: "floor", t: 0, hy: 0, th: 0 }, phi: g.mirrorA, shadeHP: 1, shadeGone: false, flee: 0, burn: 0, hitT: 0, beam: null, refl: null, glint: 0, sndT: 0 };
+  }
+  const nearMirror = () => GALS.find(g => P.onGround && !P.lamp && Math.abs(P.x - g.mirror[0]) < 1.0 && Math.abs(P.y - g.mirror[1]) < 0.4);
+  // ray against the solid rects: distance to the first hit (or max)
+  function rayHit(ox, oy, dx, dy, max) {
+    let best = max;
+    for (const r of ACTIVE) {
+      if (r.wall) continue;
+      let t0 = 0, t1 = best;
+      for (const [o, d, lo, hi] of [[ox, dx, r.l, r.r], [oy, dy, r.b, r.t]]) {
+        if (Math.abs(d) < 1e-9) { if (o < lo || o > hi) { t0 = 1; t1 = 0; } continue; }
+        let a = (lo - o) / d, b = (hi - o) / d; if (a > b) [a, b] = [b, a];
+        t0 = Math.max(t0, a); t1 = Math.min(t1, b);
+      }
+      if (t0 <= t1 && t0 > 0.05) best = Math.min(best, t0);
+    }
+    return best;
+  }
+  function galleryStep(dt, playing) {
+    for (const g of GALS) {
+      const L = g.lamp;
+      // lift the lamp, carry it (slowly), set it down; set down by the hook, the pulley takes it
+      if (L.st === "floor" && playing && !P.lamp && !P.held && P.onGround && (keys.grab || pads.grab) && Math.abs(P.x - L.x) < 0.75 && Math.abs(P.y - L.y) < 0.4) {
+        L.st = "carried"; P.lamp = g; sfx.grab();
+      }
+      if (L.st === "carried") {
+        L.x = P.x + P.facing * 0.42; L.y = P.y + 0.28;
+        if (!(keys.grab || pads.grab) || !playing || P.rope || P.inv) {
+          P.lamp = null;
+          if (Math.abs(P.x - g.hook) < 0.95 && P.onGround) { L.st = "hoist"; L.t = 0; L.x = g.hook; L.y = groundTopAt(g.hook) + 0.9; mechSfx.leverBack(); }
+          else { L.st = "floor"; L.y = groundTopAt(L.x); }
+        }
+      } else if (L.st === "hoist") {
+        // the counterweight drops and the lamp is drawn up to the beam
+        L.t += dt; const top = g.pivot[1] - g.len;
+        L.y = Math.min(top, L.y + dt * 1.6); L.x = g.hook;
+        g.sndT -= dt; if (g.sndT <= 0) { if (Math.abs(P.x - g.hook) < 14) sfx.creak(); g.sndT = 0.5; }
+        if (L.y >= top - 1e-3) { L.st = "swing"; L.t = 0; }
+      } else if (L.st === "swing") {
+        L.t += dt; L.th = 0.36 * Math.sin(L.t * 1.1 - Math.PI / 2) * Math.min(1, L.t / 1.2 + 0.4);
+        L.x = g.pivot[0] + Math.sin(L.th) * g.len; L.y = g.pivot[1] - Math.cos(L.th) * g.len;
+      }
+      // the mirror: hold grab beside it, then up / down turns it
+      g.adjust = playing && !!(keys.grab || pads.grab) && nearMirror() === g;
+      if (g.adjust) {
+        // it turns in notches, one click at a time, so a setting is easy to find again
+        const turn = ((keys.up || pads.up) ? 1 : 0) - ((keys.down || pads.down) ? 1 : 0);
+        g.notchT = (g.notchT || 0) - dt;
+        if (turn && g.notchT <= 0) { g.phi = clamp(g.phi + turn * 0.15, g.mirrorA - 1.8, g.mirrorA + 1.8); g.notchT = 0.3; sfx.click(true); }
+        if (!turn) g.notchT = 0;
+      }
+      // light: the hanging lamp throws a beam that swings with it; a mirror turns it
+      g.beam = g.refl = null; let lit = false;
+      if (L.st === "swing") {
+        const ox = L.x, oy = L.y - 0.2, mx = g.mirror[0], my = g.mirror[1] + 1.0, ux = Math.cos(g.phi + Math.PI / 2), uy = Math.sin(g.phi + Math.PI / 2), half = 0.55;
+        const cast = a => {
+          const dx = Math.cos(a), dy = Math.sin(a);
+          let len = rayHit(ox, oy, dx, dy, 40), out = null, hitShade = false;
+          const den = dx * uy - dy * ux;
+          if (Math.abs(den) > 1e-6) {
+            const t = ((mx - ox) * uy - (my - oy) * ux) / den, u = ((mx - ox) * dy - (my - oy) * dx) / den;
+            if (t > 0 && t < len && Math.abs(u) <= half) {
+              len = t;
+              const nx = Math.cos(g.phi), ny = Math.sin(g.phi), d = dx * nx + dy * ny;
+              const rx = dx - 2 * d * nx, ry = dy - 2 * d * ny, px = ox + dx * t, py = oy + dy * t;
+              let rl = rayHit(px, py, rx, ry, 30);
+              if (!g.shadeGone) {
+                const cx = g.shade[0], cy = g.shade[1] + 1.2, fx = cx - px, fy = cy - py, along = fx * rx + fy * ry;
+                const R = 1.1 * (0.45 + 0.55 * g.shadeHP);
+                if (along > 0 && along < rl && Math.abs(fx * ry - fy * rx) < R) { hitShade = true; rl = Math.min(rl, along); }
+              }
+              out = [px, py, px + rx * rl, py + ry * rl];
+            }
+          }
+          return { line: [ox, oy, ox + dx * len, oy + dy * len], out, hitShade };
+        };
+        const a0 = g.aim + L.th * 0.45, mid = cast(a0);
+        g.beam = mid.line;
+        // the beam has width: any part of it that strikes the mirror counts
+        for (const da of [0, -0.03, 0.03, -0.06, 0.06]) {
+          const c = da ? cast(a0 + da) : mid;
+          if (c.out && (!g.refl || c.hitShade)) { g.refl = c.out; g.glint = 1; }
+          if (c.hitShade) { lit = true; break; }
+        }
+      }
+      g.glint = Math.max(0, g.glint - dt * 3);
+      // the shadow burns while the light is on it, and gives up for good when it has had enough
+      if (!g.shadeGone) {
+        if (lit) { g.shadeHP = Math.max(0, g.shadeHP - dt / 0.75); g.burn = 1; g.hitT -= dt; if (g.hitT <= 0) { if (Math.abs(P.x - g.shade[0]) < 20) { noiseHit({ freq: 2200, q: 2.5, gain: 0.12, decay: 0.35, rate: 1.4 }); tone(320, 0.06, 0.4, "sawtooth", 110); } g.hitT = 0.5; } }
+        else { g.burn = Math.max(0, g.burn - dt * 2.5); }
+        if (g.shadeHP <= 0) { g.shadeGone = true; g.flee = 1; tone(140, 0.25, 1.2, "sawtooth", 40); noiseHit({ freq: 600, q: 0.5, gain: 0.3, decay: 1.2, rate: 0.5, type: "lowpass" }); }
+        else if (state === "play" && !dying && Math.abs(P.x - g.shade[0]) < 0.75 + 0.55 * g.shadeHP && P.y < g.shade[1] + 2.4 && P.y > g.shade[1] - 1) die("shadow");
+      }
+      g.flee = Math.max(0, g.flee - dt * 0.5);
+    }
   }
 
   // ---------- the upside-down hollow: a cord that turns gravity over, a ring that turns it back ----------
@@ -2232,6 +2356,7 @@ h1 span { color: var(--ember); }
     else if (kind === "wolf") wolfSfx.snarl();
     else if (kind === "crush") { sfx.die(); tone(45, 0.3, 0.6, "sine", 30); }
     else if (kind === "trap") { sfx.die(); }
+    else if (kind === "shadow") { sfx.die(); tone(60, 0.3, 1.0, "sawtooth", 25); }
     else sfx.die();
     setTimeout(() => {
       respawn();
@@ -2331,7 +2456,7 @@ h1 span { color: var(--ember); }
     RIG.rise += ((P.vy > 0.5 ? 1 : 0) - RIG.rise) * k(8);
     RIG.push += ((P.pushing ? 1 : 0) - RIG.push) * k(6);
     RIG.squash = Math.max(0, RIG.squash - dt * 4);
-    RIG.hold += ((P.held ? 1 : 0) - RIG.hold) * k(10);
+    RIG.hold += ((P.held || P.lamp ? 1 : 0) - RIG.hold) * k(10);
     RIG.pull += ((P.held && P.pulling ? 1 : 0) - RIG.pull) * k(6);
     RIG.rope += ((P.rope ? 1 : 0) - RIG.rope) * k(14);
     RIG.ropeAng = P.rope ? P.rope.ang : RIG.ropeAng * Math.max(0, 1 - dt * 10);
@@ -2746,6 +2871,96 @@ h1 span { color: var(--ember); }
         const g = ctx.createRadialGradient(SX(f.ring), SY(f.ceil - 0.5), 0, SX(f.ring), SY(f.ceil - 0.5), 0.8 * S);
         g.addColorStop(0, `rgba(255,200,130,${0.3 * k})`); g.addColorStop(1, "rgba(255,180,90,0)");
         ctx.fillStyle = g; ctx.fillRect(SX(f.ring) - 0.8 * S, SY(f.ceil - 0.5) - 0.8 * S, 1.6 * S, 1.6 * S);
+        ctx.globalCompositeOperation = "source-over";
+      }
+    }
+  }
+  function drawGallery(t, front) {
+    for (const g of GALS) {
+      if (!inView(g.hook - 8, g.shade[0] + 6)) continue;
+      const L = g.lamp;
+      if (!front) {
+        worldTransform(); ctx.fillStyle = FRONT; ctx.strokeStyle = FRONT;
+        // pulley wheel under the roof, its rope, and the counterweight that drops as the lamp rises
+        const wx = g.hook + 0.35, wy = g.pivot[1] + 0.35;
+        ctx.lineWidth = 0.05; ctx.beginPath(); ctx.arc(wx, wy, 0.32, 0, TAU); ctx.stroke();
+        ctx.fillRect(wx - 0.05, wy, 0.1, 8.6 - wy + 0.2);
+        const up = L.st === "swing" ? 1 : L.st === "hoist" ? clamp((L.y - 0.9 - groundTopAt(g.hook)) / (g.pivot[1] - g.len - 0.9), 0, 1) : 0;
+        const cwY = wy - 0.8 - (1 - up) * 0.2 - up * 3.2;
+        ctx.lineWidth = 0.03; ctx.beginPath(); ctx.moveTo(wx + 0.32, wy); ctx.lineTo(wx + 0.32, cwY); ctx.stroke();
+        ctx.fillRect(wx + 0.12, cwY - 0.55, 0.4, 0.55);
+        // the hook's rope: hanging empty, hauling, or the lamp's swinging cord
+        ctx.beginPath(); ctx.moveTo(wx - 0.32, wy);
+        if (L.st === "swing") { ctx.lineTo(g.pivot[0], g.pivot[1]); ctx.lineTo(L.x, L.y + 0.32); }
+        else if (L.st === "hoist") ctx.lineTo(g.hook, L.y + 0.32);
+        else { const hy = groundTopAt(g.hook) + 1.25 + Math.sin(t * 1.1) * 0.02; ctx.lineTo(g.hook, hy); ctx.stroke(); ctx.beginPath(); ctx.arc(g.hook, hy - 0.1, 0.1, 0, Math.PI); }
+        ctx.stroke();
+        // the mirror on its post
+        const mx = g.mirror[0], my = g.mirror[1];
+        ctx.fillRect(mx - 0.06, my, 0.12, 1.0); ctx.fillRect(mx - 0.28, my, 0.56, 0.08);
+        ctx.save(); ctx.translate(mx, my + 1.0); ctx.rotate(g.phi);
+        ctx.fillRect(-0.08, -0.6, 0.12, 1.2);
+        ctx.fillStyle = `rgba(190,205,210,${0.35 + 0.5 * g.glint + (g.adjust ? 0.2 : 0)})`; ctx.fillRect(0.02, -0.55, 0.05, 1.1);
+        ctx.restore();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        // the shadow: a heap of smoke with reaching arms and two pale eyes
+        if (!g.shadeGone || g.flee > 0) {
+          const k = g.shadeGone ? g.flee : 0.45 + 0.55 * g.shadeHP, cx = g.shade[0] + (g.shadeGone ? (1 - g.flee) * 2.5 : Math.sin(t * 7) * 0.05 * g.burn), cy = g.shade[1];
+          const near = clamp(1 - Math.abs(P.x - cx) / 6, 0, 1);
+          worldTransform(); ctx.globalAlpha = g.shadeGone ? g.flee : 1; ctx.fillStyle = "#020303";
+          ctx.beginPath();
+          for (let i = 0; i <= 28; i++) {
+            const a = Math.PI * i / 28, wob = 0.12 * Math.sin(t * 3 + i * 1.7) + 0.08 * Math.sin(t * 5.3 + i);
+            const rr = (1.0 + wob) * k * 1.35;
+            ctx.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr * 2.0);
+          }
+          ctx.fill();
+          ctx.lineCap = "round"; ctx.strokeStyle = "#020303";
+          for (let i = 0; i < 6; i++) {   // arms, reaching toward the boy when he is close
+            const side = i % 2 ? 1 : -1, base = cy + 0.6 + i * 0.22 * k, reach = (0.7 + 0.9 * near + 0.3 * Math.sin(t * 2 + i)) * k * (1 - g.burn * 0.6);
+            ctx.lineWidth = 0.12 * k * (1 - i * 0.1);
+            ctx.beginPath(); ctx.moveTo(cx + side * 0.5 * k, base);
+            const dir = side < 0 ? (P.x < cx ? 1.2 : 0.6) : 0.6;
+            ctx.quadraticCurveTo(cx + side * (0.6 + reach * 0.6) * k, base + 0.4 * Math.sin(t * 2.4 + i), cx + side * (0.5 + reach * dir) * k, base + 0.2 + 0.3 * Math.sin(t * 1.7 + i * 2));
+            ctx.stroke();
+          }
+          ctx.lineCap = "butt"; ctx.globalAlpha = 1;
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          // eyes: wide when calm, slits when burning
+          const ex = SX(cx), ey = SY(cy + 1.95 * k), es = S * 0.13 * k, sq = 1 - 0.75 * g.burn;
+          ctx.fillStyle = `rgba(232,236,226,${(g.shadeGone ? g.flee : 1) * (0.8 + 0.2 * Math.sin(t * 1.3))})`;
+          for (const o of [-1, 1]) { ctx.beginPath(); ctx.ellipse(ex + o * es * 1.7, ey, es, es * 0.55 * sq + 0.5, 0, 0, TAU); ctx.fill(); }
+        }
+      } else {
+        // the heavy lamp itself, wherever it is
+        worldTransform();
+        ctx.save(); ctx.translate(L.x, L.y); if (L.st === "swing") ctx.rotate(L.th);
+        ctx.fillStyle = FRONT;
+        ctx.fillRect(-0.02, 0.2, 0.04, 0.14); ctx.beginPath(); ctx.arc(0, 0.34, 0.07, 0, TAU); ctx.lineWidth = 0.025; ctx.strokeStyle = FRONT; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-0.24, 0.2); ctx.lineTo(0.24, 0.2); ctx.lineTo(0.17, 0.12); ctx.lineTo(-0.17, 0.12); ctx.fill();
+        const fl = 0.85 + 0.1 * Math.sin(t * 8) + 0.05 * Math.sin(t * 19);
+        ctx.fillStyle = `rgba(255,${Math.round(205 * fl)},140,1)`; ctx.fillRect(-0.15, -0.22, 0.3, 0.34);
+        ctx.fillStyle = FRONT; ctx.fillRect(-0.19, -0.22, 0.05, 0.34); ctx.fillRect(0.14, -0.22, 0.05, 0.34); ctx.fillRect(-0.22, -0.3, 0.44, 0.08);
+        ctx.fillRect(-0.03, -0.2, 0.06, 0.3);
+        ctx.restore(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+        // its glow, and the beams
+        ctx.globalCompositeOperation = "screen";
+        const gx = SX(L.x), gy = SY(L.y - 0.05), gr = (L.st === "swing" ? 2.6 : 1.8) * S;
+        const grd = ctx.createRadialGradient(gx, gy, 0, gx, gy, gr);
+        grd.addColorStop(0, "rgba(255,206,130,0.5)"); grd.addColorStop(1, "rgba(255,170,80,0)");
+        ctx.fillStyle = grd; ctx.fillRect(gx - gr, gy - gr, gr * 2, gr * 2);
+        const beam = (x0, y0, x1, y1, w0, w1, al) => {
+          const dx = x1 - x0, dy = y1 - y0, l = Math.hypot(dx, dy) || 1, nx = -dy / l, ny = dx / l;
+          const gb = ctx.createLinearGradient(SX(x0), SY(y0), SX(x1), SY(y1));
+          gb.addColorStop(0, `rgba(255,214,150,${al})`); gb.addColorStop(1, `rgba(255,190,110,${al * 0.35})`);
+          ctx.fillStyle = gb; ctx.beginPath();
+          ctx.moveTo(SX(x0 + nx * w0), SY(y0 + ny * w0)); ctx.lineTo(SX(x1 + nx * w1), SY(y1 + ny * w1));
+          ctx.lineTo(SX(x1 - nx * w1), SY(y1 - ny * w1)); ctx.lineTo(SX(x0 - nx * w0), SY(y0 - ny * w0)); ctx.fill();
+        };
+        if (g.beam) { const [a, b, c, d] = g.beam; beam(a, b, c, d, 0.12, 0.12 + Math.hypot(c - a, d - b) * 0.035, 0.32); }
+        if (g.refl) { const [a, b, c, d] = g.refl; beam(a, b, c, d, 0.16, 0.16 + Math.hypot(c - a, d - b) * 0.03, 0.42);
+          const hg = ctx.createRadialGradient(SX(c), SY(d), 0, SX(c), SY(d), 0.7 * S); hg.addColorStop(0, "rgba(255,220,170,0.45)"); hg.addColorStop(1, "rgba(255,200,140,0)");
+          ctx.fillStyle = hg; ctx.fillRect(SX(c) - 0.7 * S, SY(d) - 0.7 * S, 1.4 * S, 1.4 * S); }
         ctx.globalCompositeOperation = "source-over";
       }
     }
@@ -3633,6 +3848,7 @@ h1 span { color: var(--ember); }
     drawSeeds(t);
     drawMovers(t);
     drawRoofs(t);
+    drawGallery(t, false);
     drawChasms();
     drawPerch();
     drawWater(t, lastLantern);
@@ -3669,6 +3885,7 @@ h1 span { color: var(--ember); }
       } else lantern = drawPlayer(t, dt, wnd);
     }
     lastLantern = lantern;
+    drawGallery(t, true);
     ctx.globalCompositeOperation = "screen";
     const r2 = 0.9 * S * lantern.fl;
     const hg = ctx.createRadialGradient(lantern.x, lantern.y, 0, lantern.x, lantern.y, r2);
@@ -3711,6 +3928,16 @@ h1 span { color: var(--ember); }
     }
     SAVE.v = 2; writeSave();
   }
+  if (SAVE.v < 3) {
+    const gi = CHAPTERS.findIndex(c => c.key === "gallery"), Gc = CHAPTERS[gi];
+    if (Gc) {
+      const w = Gc.x1 - Gc.x0, firstSeed = WORLD.seeds.findIndex(([x]) => x >= Gc.x0), nSeeds = WORLD.seeds.filter(([x]) => x >= Gc.x0 && x < Gc.x1).length;
+      if (SAVE.cp && SAVE.cp.x != null && SAVE.cp.x >= Gc.x0) SAVE.cp = { x: SAVE.cp.x + w, y: SAVE.cp.y };
+      if ((SAVE.chap || 0) >= gi) SAVE.chap = (SAVE.chap || 0) + 1;
+      if (Array.isArray(SAVE.seeds) && SAVE.seeds.length > firstSeed) SAVE.seeds.splice(firstSeed, 0, ...new Array(nSeeds).fill(0));
+    }
+    SAVE.v = 3; writeSave();
+  }
 
   // ---------- UI ----------
   const $ = id => document.getElementById(id);
@@ -3741,7 +3968,7 @@ h1 span { color: var(--ember); }
     $("muteBtn").setAttribute("aria-label", AUD.muted ? "Turn sound on" : "Turn sound off");
     $("muteBtn").blur();
   });
-  if (isTouch) $("keyHelp").textContent = "Drag to move · flick up or tap to jump · hold your finger still to grab · v2.0";
+  if (isTouch) $("keyHelp").textContent = "Drag to move · flick up or tap to jump · hold your finger still to grab · v2.1";
 
   function buildLevelList() {
     const list = $("levelList");
